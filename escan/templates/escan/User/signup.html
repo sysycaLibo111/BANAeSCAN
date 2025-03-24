@@ -128,7 +128,7 @@
 <body>
   <div class="card">
     <div class="form-container">
-      <button class="close-button" onclick="window.location.href='{% url 'landing_page' %}'">X</button>
+      <button class="close-button" onclick="window.location.href=`{% url 'landing_page' %}`">X</button>
       <h1 class="form-title">Mag Sign Up</h1>
       {% if messages %}
         <div class="message-container">
@@ -162,6 +162,9 @@
         </div>
         <div class="input-group">
           <input type="password" name="password" placeholder="Password" required>
+        </div>
+        <div class="input-group">
+          <input type="hidden" name="role" value="Admin" placeholder="Role" required>
         </div>
         
         <button type="submit" class="btn">Mag-sign Up</button>

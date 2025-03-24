@@ -361,22 +361,28 @@ def product_list(request):
 
 #     products = Product.objects.all()  # Fetch all products to display
 #     return render(request, 'escan/Admin/Products/product_list.html', {'form': form, 'products': products})
+
 def add_product(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST, request.FILES)  # Ensure the form includes files
+        print("🔍 Request Files:", request.FILES)
+        form = ProductForm(request.POST, request.FILES)
+
+        print("🔍 Form cleaned_data:", form.data)
 
         if form.is_valid():
-            product = form.save()  # The save method now automatically handles the image upload
+            print("🔍 Form is valid!")
+            form = form.save()
             
-            messages.success(request, "Product added successfully.")
+            # messages.success(request, "Product added successfully.")
             return redirect('product_list')
         else:
-            print("❌ Form Errors:", form.errors)  # Debugging output
+            print("❌ Form is invalid!")
+            print("🔍 Form Errors:", form.errors)
 
     else:
         form = ProductForm()
 
-    products = Product.objects.all()  # Fetch all products for display
+    products = Product.objects.all()
     return render(request, 'escan/Admin/Products/product_list.html', {'form': form, 'products': products})
 
 # def upload_product(request):
@@ -454,7 +460,7 @@ def signup_view(request):
         username = request.POST.get("username")
         email = request.POST.get("email")
         password = request.POST.get("password")
-        role = request.POST.get("role", "User")  # Get the selected user role
+        role = request.POST.get("role", "Admin")  # Get the selected user role
 
         # Ensure the username or email is not already taken
         if CustomUser.objects.filter(username=username).exists():
@@ -476,7 +482,7 @@ def signup_view(request):
         )
 
         messages.success(request, "Account created successfully! Please log in.")
-        return redirect("login")  # Redirect to the login page after successful signup
+        return redirect("admin_login")  # Redirect to the login page after successful signup
 
     return render(request, "escan/User/signup.html")
 
