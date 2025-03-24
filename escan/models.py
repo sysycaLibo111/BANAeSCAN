@@ -76,7 +76,7 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(default=0, max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(default=0)
-    image_url = models.ImageField(blank=True, null=True)  # Store image URL from Supabase
+    image_url = models.ImageField(max_length=500, blank=True, null=True)  # Store image URL from Supabase
     created_at = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 
