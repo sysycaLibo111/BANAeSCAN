@@ -1,0 +1,144 @@
+/* Center the card */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #fff8dc;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.card {
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+}
+
+/* Title */
+.card h2 {
+    margin-bottom: 30px;
+    color: black;
+}
+
+/* Form styling */
+.card input, 
+.card select {
+    width: 90%;
+    padding: 20px;
+    border: 2px solid #ccc;
+    font-size: 20px;
+    margin: 15px 0;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.card select {
+    width: 70%;
+    padding: 10px;
+}
+
+.card input:focus, 
+.card select:focus {
+    border-color: orange;
+    outline: none;
+    box-shadow: 0px 0px 10px rgba(255, 165, 0, 0.5);
+}
+
+/* Close button */
+.close-button {
+    width: 80px;
+    padding: 15px;
+    background-color: yellow;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.3s;
+    float: right;
+}
+
+/* Sign in button */
+.Sign {
+    font-size: 20px;
+    width: 90%;
+    padding: 15px;
+    background-color: yellow;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 15px;
+}
+
+.Sign:hover {
+    background-color: yellow;
+}
+
+/* Signup link */
+.card p {
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+.card a {
+    color: blue;
+    text-decoration: none;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
+
+/* Separator */
+.separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.separator .line {
+    flex: 1;
+    height: 1px;
+    background-color: #ccc;
+    border: none;
+}
+
+.separator span {
+    margin: 0 10px;
+    color: #666;
+}
+
+/* Google sign in */
+.google-signup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 3px solid #ccc; 
+    padding: 5px 15px;
+    font-size: 20px; 
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 70%; 
+    margin: 20px auto 0;
+}
+
+.google-signup img {
+    height: 40px; /* Bigger image */
+    width: 40px;
+    border-radius: 50%;
+}
+
+.google-signup:hover {
+    background-color: #f0f0f0;
+}

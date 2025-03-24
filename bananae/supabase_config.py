@@ -1,0 +1,8 @@
+from supabase import create_client
+import os
+from dotenv import load_dotenv
+# Replace these with your actual Supabase credentials
+SUPABASE_URL="https://crvtfxinuvycxwgihree.supabase.co"
+SUPABASE_API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNydnRmeGludXZ5Y3h3Z2locmVlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDA5NzQ4MjEsImV4cCI6MjA1NjU1MDgyMX0.k0_gyPkg5Egc_BvJ9tanM-XKOy9pplozaKDlkGIAHYk"
+
+supabase = create_client(SUPABASE_URL, SUPABASE_API_KEY)

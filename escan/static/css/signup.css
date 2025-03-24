@@ -1,0 +1,161 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-image: url("../img/6.png"); 
+    background-size: cover;
+    background-position: center;
+}
+
+.card {
+    background-color: white;
+    border-radius: 20px; /* Increased for better rounded look */
+    padding: 40px; /* Increased padding */
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+    max-width: 600px; /* Increased max width */
+    width: 100%;
+}
+
+.card h2 {
+    text-align: center;
+    color: black;
+    font-size: 36px; /* Larger font */
+}
+
+
+.close-button {
+    width: 80px;
+    padding: 15px;
+    background-color: yellow;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.3s;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    margin-left: 10px;
+    width: 90%;
+    padding: 20px; 
+    font-size: 20px;
+    border: 3px solid #b9b2b2; 
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+    border-color: orange;
+    outline: none;
+    border-radius: 10%;
+    box-shadow: 0px 0px 10px rgba(255, 165, 0, 0.5);
+}
+
+.Sign {
+    margin-left: 40px;
+    width: 90%; /* Bigger button */
+    padding: 15px;
+    background-color: yellow;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.3s;
+}
+
+
+/* OR Separator with Lines */
+.separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin: 20px 0; /* Space above and below */
+}
+
+/* Style for lines */
+.separator .line {
+    flex-grow: 1;
+    height: 2px; /* Thickness of line */
+    background-color: #ccc; /* Light grey */
+    border: none;
+    margin: 0 10px; /* Space between text and lines */
+}
+
+/* Style for OR text */
+.separator span {
+    font-size: 10px;
+    color: #555;
+}
+
+.store {
+    width: 200px;
+    padding: 15px;
+    background-color: rgb(12, 87, 3);
+    color: yellow;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.3s;
+}
+
+.card button:hover {
+    background-color: orange;
+}
+
+.card p {
+    text-align: center;
+    font-size: 24px;
+}
+
+.card a {
+    color: blue;
+    font-size: 24px;
+    text-decoration: none;
+}
+
+.card a:hover {
+    text-decoration: underline;
+}
+
+
+.google-signup {
+    margin-left: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 3px solid #ccc; 
+    padding: 5px 15px;
+    font-size: 20px; 
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: 0.3s;
+    width: 70%; 
+    margin-top: 20px;
+}
+
+.google-signup img {
+    justify-content: flex-end;
+    height: 40px; /* Bigger image */
+    width: 40px;
+    border-radius: 50%;
+}
+
+.google-signup:hover {
+    background-color: #f0f0f0;
+}

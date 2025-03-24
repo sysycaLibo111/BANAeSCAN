@@ -1,0 +1,658 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BANAeScan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+
+  <!-- Bootstrap Icons CDN -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- 
+  <link rel="stylesheet" href="/static/css/landing.css"> -->
+</head>
+<style>
+  
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    color: #fff;
+    background-color: #034d08;
+    
+  }
+  
+  .content {
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+  }
+  
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 20px;
+    background-color: #034d08;
+  }
+  nav .span {
+    color: white;
+    font-size: 30px; 
+    font-weight: bold;}
+  
+  nav .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  nav .logo img {
+    height: 80px;
+    margin-right: 10px;
+    border-radius: 50%;
+  }
+  
+  nav .menu {
+    display: flex;
+    gap: 20px;
+  }
+  
+  nav .menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 30px;
+  }
+  
+  nav .menu a:hover {
+    text-decoration: underline;
+  }
+  
+  .burger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  
+  .burger div {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 4px 0;
+  }
+  
+  .services-section {
+    margin-top: 2in;
+    padding: 80px 10px;
+    background-color: white;
+    text-align: center;
+  }
+
+  .services-title {
+    font-size: 48px;
+    color: black;
+    font-weight: bold;
+    margin-bottom: 50px;
+  }
+
+  .service-card {
+    background: rgb(224, 166, 6);
+    border: 2px solid yellow;
+    border-radius: 10px;
+    padding: 30px;
+    text-align: center;
+    color: white;
+    transition: transform 0.3s;
+  }
+
+  .service-card:hover {
+    transform: scale(1.5);
+  }
+
+  .service-gif {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .service-text {
+    font-size: 24px;
+    font-weight: bold;
+  }
+  .image-container {
+    position: relative;
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url("/static/img/bc1.png"); 
+    background-size: cover;
+    background-position: center;
+  }
+  .overlay-content {
+    display: flex;
+    align-items: center;
+    max-width: 2000px;
+    text-align: center;
+    gap: 30px;
+  }
+  
+  .overlay-content img {
+    border-radius: 50%;
+    border: 2px solid rgb(1, 7, 2);
+    padding: 5px;
+    width: 600px;
+    height: 600px;
+  }
+  
+  .text-content {
+    flex: 1;
+    padding-left: 50px;
+  }
+  
+  .text-content span {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: rgb(240, 129, 3);
+    font-weight: bold;
+  }
+  
+  .text-content p {
+    font-size: 40px;
+    margin-top: 20px;
+    color: #fcf9f9;
+    padding: 20px;
+    text-align: justify;
+    text-align-last: center; 
+    margin-bottom: 10px;
+  }
+  .card {
+    background-color: rgba(19, 19, 1, 0.747);
+    padding: 20px;
+    height: 800px;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    background-color: yellow;
+    color: black;
+    font-size: 30px;
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn:hover {
+    background-color: orange;
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .btn:after {
+    display: none;
+    font-size: 12px;
+    color: red;
+  }
+  
+  .btn:hover:after {
+    display: inline;
+  }
+  
+  .team-section {
+    margin-top: 15px;
+    padding: 60px 20px;
+    text-align: center;
+    background-color:#034d08;
+  }
+  
+  .team-title {
+    font-size: 36px;
+    color: yellow;
+    margin-bottom: 40px;
+  }
+  
+  .team-member {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid yellow;
+    text-align: center;
+  }
+  
+  .team-member img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 20%;
+    margin-bottom: 15px;
+    border: 2px solid yellow;
+  }
+  
+  .team-member h3 {
+    font-size: 20px;
+    color: black;
+    margin-bottom: 5px;
+  }
+  
+  .team-member p {
+    font-size: 14px;
+    color: black;
+  }
+  /* Responsive Design */
+
+/* For screens up to 1024px */
+@media (max-width: 1024px) {
+  nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 10px;
+    justify-content: space-between;
+  }
+
+  nav .menu {
+    flex-direction: end;
+    gap: 15px;
+  }
+  span {
+    color: white;
+   font-size: 18px; 
+  font-weight: bold;}
+  
+  nav .logo {
+    display: flex;
+    align-items: center;
+  }
+
+  nav .menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 20px;
+  }
+  .overlay-content {
+    display: flex;
+    text-align: center;
+  }
+
+  .overlay-content img {
+    width: 250px;
+    height: 250px;
+    gap: 30px;
+    margin-left: 20px;
+  }
+
+  .text-content {
+    flex: 1;
+    padding-left: 20px;
+  }
+  
+  .text-content span {
+    font-size: 30px;
+    margin-bottom: 10px;
+    color: rgb(240, 129, 3);
+    font-weight: bold;
+  }
+
+  .text-content p {
+    font-size: 20px;
+    margin-top: 10px;
+    color: #fcf9f9;
+    padding: 15px;
+    text-align: justify;
+    text-align-last: center; 
+
+  }
+  .card {
+    background-color: rgba(19, 19, 1, 0.747);
+    padding: 20px;
+    height: 550px;
+    margin-right: 50px;
+  }
+
+  .btn {
+    padding: 5px 15px;
+    background-color: yellow;
+    color: black;
+    font-size: 20px;
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  }
+
+  .services-section {
+    margin-top: 1in;
+    padding: 80px 20px;
+    background-color: white;
+    text-align: center;
+  }
+  
+  .services-section span {
+    font-size: 30px;
+    color: black;
+    font-weight: bold;
+    margin-bottom: 50px;
+    
+  }
+  .service-card {
+    background: rgb(228, 141, 11);
+    border: 2px solid black;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    color: black;
+    width: 300px;
+    height: 400px;
+    transition: transform 0.3s;
+  }
+
+  .service-card:hover {
+    transform: scale(1.2);
+    background-color: #034d08;
+    color: white;
+    border: 2px solid rgb(228, 141, 11);
+    
+  }
+
+  .team-section span{
+    font-size: 30px;
+    color: rgb(228, 141, 11);
+  }
+
+  .team-member img {
+    width: 150px;
+    height: 150px;
+  }
+
+  .team-member {
+    background-color: white;
+    padding: 15px;
+    border-radius: 10px;
+    height: 300px;
+    border: 1px solid yellow;
+    text-align: center;
+  }
+}
+
+/* For screens up to 754px */
+@media (max-width: 754px) {
+  nav {
+    display: flex;
+    justify-content: space-between;
+    padding: 18px 8px;
+    justify-content: space-between;
+  }
+
+  .burger {
+    display: flex;
+  }
+
+  nav .menu {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  nav .menu a {
+    font-size: 24px;
+  }
+
+  span {
+    color: white;
+   font-size: 16px; 
+  font-weight: bold;}
+  
+
+  .overlay-content img {
+    width: 200px;
+    height: 200px;
+    gap: 30px;
+    margin-left: 20px;
+  }
+
+  .text-content {
+    flex: 1;
+    padding-left: 20px;
+  }
+  .text-content span {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: rgb(240, 129, 3);
+    font-weight: bold;
+  }
+
+  .text-content p {
+    font-size: 16px;
+    margin-top: 5px;
+    color: #fcf9f9;
+    padding: 15px;
+    text-align: justify;
+    text-align-last: center; 
+  }
+  .btn {
+    padding: 3px 10px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 8px;
+  }
+  .service-title {
+    font-size: 32px;
+  }
+
+  .service-card {
+    padding: 20px;
+  }
+
+  .btn {
+    font-size: 24px;
+    padding: 8px 20px;
+  }
+
+  .team-title {
+    font-size: 26px;
+  }
+
+  .team-member h3 {
+    font-size: 18px;
+  }
+
+  .team-member p {
+    font-size: 12px;
+  }
+}
+
+/* For screens up to 324px */
+@media (max-width: 324px) {
+  span{
+    font-size: 16px;
+    align-items: start;
+  }
+  nav {
+    padding: 10px;
+  }
+
+  .burger div {
+    width: 20px;
+    height: 2px;
+  }
+
+  .overlay-content img {
+    width: 200px;
+    height: 200px;
+  }
+
+  .text-content p {
+    font-size: 18px;
+    padding: 10px;
+  }
+
+  .service-title {
+    font-size: 24px;
+  }
+
+  .service-card {
+    padding: 15px;
+  }
+
+  .btn {
+    font-size: 18px;
+    padding: 6px 15px;
+  }
+
+  .team-title {
+    font-size: 20px;
+  }
+
+  .team-member img {
+    width: 100px;
+    height: 100px;
+  }
+
+  .team-member h3 {
+    font-size: 16px;
+  }
+
+  .team-member p {
+    font-size: 10px;
+  }
+}
+
+</style>
+<body>
+  <nav>
+    <div class="logo">
+      <img src="/static/img/LogoW.png" alt="BANAeScan Logo">
+      <span >BANAe-SCAN</span>
+    </div>
+    <div class="burger">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+    <div class="menu">
+      <a href="#about" >
+        <i class="bi bi-info-circle" style="margin-right: 12px;"></i>Tungkol
+    </a>
+      <a href="#services"><i class="bi bi-tools" style="margin-right: 10px;"></i>MgaSerbisyo
+      </a>
+      <a href="#team"><i class="bi bi-people" style="margin-right: 12px;"></i>Grupo</a>
+    </div>
+  </nav>
+
+  <div class="image-container">
+    <div class="overlay-content">
+      <img src="/static/img/LogoW.png" alt="Banana Logo">
+      <div class="text-content">
+        <div class="card"> 
+        <span>Welcome to BANAe-SCAN: Smart Farming Made Simple! 🌱📸</span>
+        <p> Ang iyong all-in-one na plataporma para sa pagtukoy ng sakit 
+          ng saging at pagkilala sa iba't ibang uri! I-scan lamang ang iyong 
+          halaman ng saging upang masuri ang mga sakit at matuklasan ang uri nito. 
+          Dagdag pa, tuklasin ang aming tindahan upang bumili ng mga de-kalidad na 
+          produktong may kaugnayan sa saging, na tinitiyak ang mas malusog na mga 
+          pananim at mas magandang ani.
+        </p>
+        <p>🌿 Scan. Identify. Shop. Grow. 🛒 Add to cart now!</p>
+        
+        <!-- ✅ Buttons Added with Reverse Fix -->
+        <div class="buttons">
+          <a href="{% url 'login' %}" class="btn btn-yellow">Mag Login</a><a href="{% url 'signup_view' %}" class="btn btn-yellow">Mag Sign Up</a>
+
+        </div>
+
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <section id="services" class="services-section">
+    <span class="services-title">Mga Serbisyo</span>
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="service-card">
+            <img src="{% static 'img/Disease.gif' %}" alt="Scanning Service" class="service-gif">
+            <p class="service-text">Pagtukoy ng Sakit ng Saging</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="service-card">
+            <img src="{% static 'img/Variety.gif' %}" alt="Vriety Service" class="service-gif">
+            <p class="service-text">Pagtukoy ng Uri ng Sanging</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="service-card">
+            <img src="{% static 'img/Identify.gif' %}" alt="Expert Advice" class="service-gif">
+            <p class="service-text">Pamilihan</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="team-section" id="team">
+    <span class="team-title">Meet the Team</span>
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-3">
+          <div class="team-member">
+            <img src="/static/img/sy.png" alt="Syren D. Calibo">
+            <h3>Syren D. Calibo</h3>
+            <p>Project Leader & Developer</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="team-member">
+            <img src="/static/img/jim.png" alt="Jimmilyn H. Pascua">
+            <h3>Jimmilyn H. Pascua</h3>
+            <p>UI/UX Designer</p>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="team-member">
+            <img src="/static/img/mar.png" alt="Mary Rose U. Pardilla">
+            <h3>Mary Rose U. Pardilla</h3>
+            <p>Database Specialist</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Footer-->
+<footer class="py-2" style="background: rgb(228, 141, 11)">
+  <div class="container"><p class="m-0 text-center text-white">Copyright &copy; BANAe-SCAN system 2025</p></div>
+</footer>
+
+  <script src="/static/js/script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+    const burger = document.querySelector(".burger");
+    const menu = document.querySelector(".menu");
+
+    burger.addEventListener("click", function() {
+        menu.classList.toggle("show");
+    });
+});
+  </script>
+
+</body>
+</html>

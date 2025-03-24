@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    
+  
+    <style>
+       .sidebar {
+    height: 100vh;
+    width: 380px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #c1b22e;
+    padding-top: 20px;
+    text-align:start;
+    display: start;
+    flex-direction: column;
+    align-items:start;
+}
+
+/* Logo Styling */
+.logo-container {
+    margin-bottom: 50px;
+}
+
+.logo {
+    width: 150px; 
+    margin-left: 100px;
+    padding: 5px;
+    border-radius: 50%;
+    border: 2px solid rgb(231, 235, 231);
+    align-items: center;
+    height: auto;
+}
+
+/* Sidebar Links */
+.sidebar a {
+    margin-left: 50px;
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    gap: 20px;
+    text-decoration: none;
+    font-size: 30px; /* Set font size to 30px */
+    color: black;
+    padding: 15px 30px;
+    width: 100%;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar i {
+    font-size: 30px; /* Make icons the same size as text */
+}
+
+/* Consistent gap between links */
+.sidebar a + a {
+    margin-top: 30px; /* 30px gap between links */
+}
+
+.sidebar a:hover {
+    background-color: #f3f9f3;
+    border-top-left-radius: 20px;  /* Rounded top-left corner */
+    border-bottom-left-radius: 20px;  /* Rounded bottom-left corner */
+    width: 330px;
+    color:black;
+
+}
+
+    </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar">
+    <div class="logo-container">
+        <img src="{% static 'img/LogoW.png' %}" alt="Logo" class="logo">
+    </div>
+    <a href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+    <a href="{% url 'product_list' %}"><i class="fas fa-box"></i>Inventory</a>
+    <a href="#"><i class="fas fa-shopping-cart"></i> Order</a>
+    <a href="#"><i class="fas fa-chart-line"></i> Sales</a>
+    <a href="#"><i class="fas fa-file-alt"></i> Scan Report</a>
+    <a href="{% url 'logout' %}" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+</div>
+
+<!-- Content Block -->
+<div class="content">
+    {% block content %}
+    {% endblock %}
+</div>
+
+</body>
+</html>

@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="content"style="padding-right: 450px;">
+<div class="container">
+    <h1 style="font-weight: bold;">CATEGORY LIST</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="margin-left: 100px;padding: 6px 15px;font-size: 1.5rem;border-radius: 5px;"><i class="bi bi-plus"></i>Add Category</button>
+    <table class="table mt-3" style="margin-left: 100px;">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="categoryTableBody">
+            {% for category in categories %}
+            <tr id="category-{{ category.id }}">
+                <td>{{ category.id }}</td>
+                <td>{{ category.name }}</td>
+                <td>{{ category.description }}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm edit-btn" data-id="{{ category.id }}" data-name="{{ category.name }}" data-description="{{ category.description }}"><i class="bi bi-pencil-square"></i>Bagohin</button>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="{{ category.id }}"><i class="fas fa-trash"></i> Tanggalin</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="categoryName" class="form-control" placeholder="Category Name">
+                <textarea id="categoryDescription" class="form-control mt-2" placeholder="Description"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="saveCategory">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editCategoryId">
+                <input type="text" id="editCategoryName" class="form-control">
+                <textarea id="editCategoryDescription" class="form-control mt-2"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="updateCategory">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Add Category
+    document.getElementById("saveCategory").addEventListener("click", function() {
+        let name = document.getElementById("categoryName").value;
+        let description = document.getElementById("categoryDescription").value;
+        fetch("{% url 'add_category' %}", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ name, description })
+        })
+        .then(response => response.json())
+        .then(data => {
+            let row = `<tr id="category-${data.id}">
+                <td>${data.id}</td>
+                <td>${data.name}</td>
+                <td>${data.description}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm edit-btn" data-id="${data.id}" data-name="${data.name}" data-description="${data.description}">Edit</button>
+                    <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}">Delete</button>
+                </td>
+            </tr>`;
+            document.getElementById("categoryTableBody").insertAdjacentHTML("beforeend", row);
+            document.getElementById("categoryName").value = "";
+            document.getElementById("categoryDescription").value = "";
+            new bootstrap.Modal(document.getElementById("addCategoryModal")).hide();
+        });
+    });
+
+    // Open Edit Modal
+    document.addEventListener("click", function(event) {
+        if (event.target.classList.contains("edit-btn")) {
+            let id = event.target.getAttribute("data-id");
+            let name = event.target.getAttribute("data-name");
+            let description = event.target.getAttribute("data-description");
+            document.getElementById("editCategoryId").value = id;
+            document.getElementById("editCategoryName").value = name;
+            document.getElementById("editCategoryDescription").value = description;
+            new bootstrap.Modal(document.getElementById("editCategoryModal")).show();
+        }
+    });
+
+    // Update Category
+    document.getElementById("updateCategory").addEventListener("click", function() {
+        let id = document.getElementById("editCategoryId").value;
+        let name = document.getElementById("editCategoryName").value;
+        let description = document.getElementById("editCategoryDescription").value;
+        fetch(`/edit-category/${id}/`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "X-CSRFToken": "{{ csrf_token }}" },
+            body: JSON.stringify({ name, description })
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.querySelector(`#category-${data.id} td:nth-child(2)`).textContent = data.name;
+            document.querySelector(`#category-${data.id} td:nth-child(3)`).textContent = data.description;
+            new bootstrap.Modal(document.getElementById("editCategoryModal")).hide();
+        });
+    });
+
+    // Delete Category
+    document.addEventListener("click", function(event) {
+        if (event.target.classList.contains("delete-btn")) {
+            let id = event.target.getAttribute("data-id");
+            fetch(`/delete-category/${id}/`, { method: "POST", headers: { "X-CSRFToken": "{{ csrf_token }}" } })
+            .then(() => document.getElementById(`category-${id}`).remove());
+        }
+    });
+});
+</script>
+{% endblock %}

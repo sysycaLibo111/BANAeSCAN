@@ -1,0 +1,219 @@
+the problem is about generating image_url that must be automatic put the image_url in product table after add image in upload_product ...then the image file can upload to supabase 
+can you help for that logical thing 
+ then this all my set up 
+ forms.py(from django.contrib.auth.models import AbstractUser, Group, Permission
+from django.db import models
+# from django.contrib.auth.models import 
+from django.conf import settings
+import uuid
+import os
+
+class CustomUser(AbstractUser):
+    ROLE_CHOICES = [
+        ('Admin', 'Admin'),
+        ('User', 'User'),
+    ]
+
+    id = models.AutoField(primary_key=True)  # Unique ID for each user
+    first_name = models.CharField(max_length=50)  # First name field
+    last_name = models.CharField(max_length=50)  # Last name field
+    username = models.CharField(max_length=50, unique=True)  # Unique username
+    email = models.EmailField(unique=True)  # Unique email
+    password = models.CharField(max_length=255)  # Hashed password storage
+    is_deleted = models.BooleanField(default=False)  # Soft delete field
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='User')
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def restore(self):
+        self.is_deleted = False
+        self.save()
+
+    class meta:
+        bd_table = 'user_account'
+        
+
+class PasswordReset(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    reset_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    created_when = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Password reset for {self.user.username} at {self.created_when}"
+    
+    class Meta:
+        app_label = 'escan'
+
+
+
+
+# E-commerce related models
+
+class Category(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    description = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'category'
+
+    def __str__(self):
+        return self.name
+
+
+class Customer(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    address = models.TextField(blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+
+    class Meta:
+        db_table = 'customer'
+
+    def __str__(self):
+        return self.user.username
+
+class Product(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True, null=True)
+    price = models.DecimalField(default=0, max_digits=10, decimal_places=2)
+    stock = models.PositiveIntegerField(default=0)
+    image_url = models.URLField(blank=True, null=True)  # Store image URL from Supabase
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False)
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.save()
+
+    def restore(self):
+        self.is_deleted = False
+        self.save()
+    
+
+    class Meta:
+        db_table = 'product'
+
+    def __str__(self):
+        return self.name
+
+
+class Order(models.Model):
+    product= models.ForeignKey(Product, on_delete=models.CASCADE)
+    customer= models.ForeignKey(Customer, on_delete=models.CASCADE)
+    quantity=models.IntegerField()
+    order_date= models.DateTimeField(auto_now_add=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status=models.BooleanField(default=False)
+    
+
+    class Meta:
+        db_table = 'order'
+
+    def __str__(self):
+        return f"Order {self.id} by {self.customer.user.username}"
+
+)
+
+views.py(
+def add_product(request):
+    if request.method == 'POST':
+        print("🔍 Request Files:", request.FILES)
+        form = ProductForm(request.POST, request.FILES)  # Ensure image file is included
+
+        # print("🔍 Form cleaned_data:", form.data)
+        
+        if form.is_valid():
+            print("🔍 Form is valid!")  # Debugging output
+
+            # Save the product, which includes image upload logic in the form's save method
+            form.save()  # The form's save method handles image upload to Supabase
+
+            # messages.success(request, "Product added successfully.")
+            return redirect('product_list')
+        else:
+            print("❌ Form is invalid!")  # Debugging output
+            # print("🔍 Form Errors:", form.errors)  # Print form errors to debug
+    else:
+        form = ProductForm()
+
+    products = Product.objects.all()  # Fetch all products to display in the table
+    return render(request, 'escan/Admin/Products/product_list.html', {'form': form, 'products': products})
+)
+
+
+supabase_helper.py(import supabase
+from io import BytesIO
+from django.conf import settings
+import logging
+
+# Supabase configuration
+SUPABASE_URL = settings.SUPABASE_URL
+SUPABASE_ROLE_KEY = settings.SUPABASE_ROLE_KEY
+SUPABASE_BUCKET = settings.SUPABASE_BUCKET  # Set in settings.py
+
+# Initialize Supabase client
+supabase_client = supabase.create_client(SUPABASE_URL, SUPABASE_ROLE_KEY)
+
+# Logger setup
+logger = logging.getLogger(__name__)
+
+def upload_image_to_supabase(image_file, image_name):
+    try:
+        # Read image file bytes
+        image_bytes = image_file.read()
+
+        # ✅ Upload to Supabase storage
+        response = supabase_client.storage.from_(SUPABASE_BUCKET).upload(
+            f"product-images/{image_name}", image_bytes, file_options={"content-type": image_file.content_type}
+        )
+
+        # ✅ Debugging log
+        logger.info(f"Supabase Response: {response}")
+
+        if "error" in response:
+            logger.error(f"Supabase Upload Error: {response['error']}")
+            return None
+
+        # ✅ Generate and return the public URL
+        return f"{SUPABASE_URL}/storage/v1/object/public/{SUPABASE_BUCKET}/product-images/{image_name}"
+
+    except Exception as e:
+        logger.error(f"Upload Error: {e}")
+        return None
+)
+ forms.py(from django import forms
+from .models import Category, Product
+from django.conf import settings
+import logging
+from .supabase_helper import upload_image_to_supabase
+
+logger = logging.getLogger(__name__)
+
+class CategoryForm(forms.ModelForm):
+    class Meta:
+        model = Category
+        fields = ['name', 'description']
+
+class ProductForm(forms.ModelForm):
+    image = forms.ImageField(required=True)  # Handle file input
+
+    class Meta:
+        model = Product
+        fields = ['name', 'description', 'price', 'stock', 'category'] 
+    
+    def save(self, commit=True):
+        product = super().save(commit=False)
+        
+        image_file = self.cleaned_data.get('image')  # Get image file
+        if image_file:
+            image_name = f"product_{product.name.replace(' ', '_')}.png"
+            image_url = upload_image_to_supabase(image_file, image_name)
+            if image_url:
+                product.image_url = image_url  # Save image URL in DB
+
+        if commit:
+            product.save()
+        return product
+)

@@ -1,0 +1,42 @@
+/* Content Area */
+.content {
+    margin-left: 150px;
+    padding: 10px;
+    padding-left: 30px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+}
+
+/* Card Styling */
+.card {
+    border-radius: 8px;
+    text-align: center;
+    padding: 10px;
+    min-width: 400px; /* Ensuring cards don't shrink too much */
+}
+
+/* Card Header and Text */
+.card-header {
+    font-weight: bold;
+    font-size: 25px;
+    color: black;
+}
+
+.card-title {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.card-text {
+    font-size: 20px;
+}
+
+/* Responsive Cards in One Line */
+.card-container {
+    margin-left: 50px;
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    gap: 20px; /* Ensuring an exact 20px gap */
+    overflow-x: auto; /* Enable horizontal scrolling if needed */
+    padding: 10px;
+}

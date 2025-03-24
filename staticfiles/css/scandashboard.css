@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    background-image: url("../img/6.png");
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+    color: #fff;
+    font-size: 24px; /* Increase default font size */
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 40px; /* Double padding */
+    background-color: #013406;
+}
+
+nav .logo img {
+    height: 80px; /* Double logo size */
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+nav .menu {
+    display: flex;
+    gap: 40px;
+}
+
+nav .menu a {
+    font-size: 28px; /* Double font size */
+}
+
+.burger div {
+    width: 50px; /* Double burger size */
+    height: 6px;
+}
+
+.card-container-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 60px;
+    margin: 1in auto 0; /* Increased spacing */
+}
+
+.card-container {
+    width: 8in;
+    height: 5in;
+    padding: 40px;
+    border-radius: 20px;
+}
+
+.card-container img {
+    height: calc(4in - 60px); /* Increased size */
+}
+
+.card-container p {
+    font-size: 50px; /* Double text size */
+}

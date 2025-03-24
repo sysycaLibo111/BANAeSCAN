@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  {% extends 'base.html' %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - BANAeScan</title>
+  <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        background-color: #fff8dc;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .card {
+        background: url("{% static 'img/bc1.png' %}") no-repeat center/cover;
+        width: 750px;
+        height: 800px;
+        padding: 30px;
+        border-radius: 18px;
+        box-shadow: 0 6px 12px rgba(215, 102, 3, 0.883);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .close-button {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 15px;
+        color: black;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s;
+    }
+
+    .form-container {
+        width: 85%;
+        height: 85%;
+        background-color: rgba(17, 62, 4, 0.75);
+        padding: 60px;
+        border-radius: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .form-title {
+        font-size: 24px;
+        font-weight: bold;
+        color: #d4a017;
+        margin-bottom: 30px;
+    }
+
+    .input-group {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .input-group input {
+        width: 600px;
+        font-size: 20px;
+        height: 60px;
+        padding: 15px;
+        border: 1.5px solid #aaa;
+        border-radius: 7px;
+        outline: none;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+
+    .btn {
+        width: 80%;
+        height: 67px;
+        font-size: 24px;
+        border: none;
+        border-radius: 7px;
+        color: #fff;
+        background-color: #d4a017;
+        cursor: pointer;
+        transition: 0.3s;
+        margin-top: 10px;
+        align-items: center;
+        margin-left: 50px;
+    }
+
+    .btn:hover {
+        background-color: #b8860b;
+    }
+
+    .separator {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 10px 0;
+        width: 100%;
+    }
+
+    .separator .line {
+        flex: 1;
+        height: 1.5px;
+        background-color: #ccc;
+        border: none;
+    }
+
+    .separator span {
+        margin: 0 12px;
+        color: #fff;
+    }
+
+    .login-link {
+        text-align: center;
+        font-size: 20px;
+        color: white;
+        margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="form-container">
+     
+      <h1 class="form-title">Mag Sign Up</h1>
+      {% if messages %}
+        <div class="message-container">
+          {% for message in messages %} 
+            {% if message.tags == 'error' %}
+              <div class="error-message">
+                <h4>{{ message }}</h4>
+              </div>
+            {% else %}
+              <div class="info-message">
+                <h4>{{ message }}</h4>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      
+      <form method="POST">
+        {% csrf_token %}
+        <div class="input-group">
+          <input type="text" name="first_name" placeholder="First Name" required>
+        </div>
+        <div class="input-group">
+          <input type="text" name="last_name" placeholder="Last Name" required>
+        </div>
+        <div class="input-group">
+          <input type="text" name="username" placeholder="Username" required>
+        </div>
+        <div class="input-group">
+          <input type="email" name="email" placeholder="Email" required>
+        </div>
+        <div class="input-group">
+          <input type="password" name="password" placeholder="Password" required>
+        </div>
+        
+        <button type="submit" class="btn">Mag-sign Up</button>
+      </form>
+      
+      <p class="login-link">Mayroon na bang account? <a href="{% url 'admin_login' %}" style="color: #d4a017;">Mag login dito</a></p>
+      <div class="separator">
+        <hr class="line">
+        <span>OR</span>
+        <hr class="line">
+      </div>
+    </div>
+  </div>
+</body>
+</html>

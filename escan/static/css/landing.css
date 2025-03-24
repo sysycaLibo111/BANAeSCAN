@@ -1,0 +1,293 @@
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    color: #fff;
+    
+  }
+  
+  .content {
+    background-size: cover;
+    background-position: center;
+    margin: 0;
+  }
+  
+  nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 30px 20px;
+    background-color: #013406;
+  }
+  span {
+    color: white;
+   font-size: 30px; 
+  font-weight: bold;}
+  
+  nav .logo {
+    display: flex;
+    align-items: center;
+  }
+  
+  nav .logo img {
+    height: 80px;
+    margin-right: 10px;
+    border-radius: 50%;
+  }
+  
+  nav .menu {
+    display: flex;
+    gap: 20px;
+  }
+  
+  nav .menu a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 30px;
+  }
+  
+  nav .menu a:hover {
+    text-decoration: underline;
+  }
+  
+  .burger {
+    display: none;
+    flex-direction: column;
+    cursor: pointer;
+  }
+  
+  .burger div {
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin: 4px 0;
+  }
+  
+  @media (max-width: 524px) {
+    .menu {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 60px;
+      right: 15px;
+      background-color: green;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  
+    .menu.show {
+      display: flex;
+    }
+  
+    .burger {
+      display: flex;
+    }
+  }
+  
+  .image-container {
+    position: relative;
+    width: 100%;
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url("../img/bc1.png"); 
+    background-size: cover;
+    background-position: center;
+  }
+  .overlay-content {
+    display: flex;
+    align-items: center;
+    max-width: 2000px;
+    text-align: center;
+    gap: 30px;
+  }
+  
+  .overlay-content img {
+    border-radius: 50%;
+    border: 2px solid rgb(1, 7, 2);
+    padding: 5px;
+    width: 600px;
+    height: 600px;
+  }
+  
+  .text-content {
+    flex: 1;
+    padding-left: 50px;
+  }
+  
+  .text-content h1 {
+    
+    margin-bottom: 10px;
+    color: rgb(240, 129, 3);
+    font-weight: bold;
+  }
+  
+  .text-content p {
+    font-size: 40px;
+    margin-top: 20px;
+    color: #fcf9f9;
+    padding: 20px;
+    text-align: justify;
+    text-align-last: center; 
+    margin-bottom: 10px;
+  }
+  .card {
+    background-color: rgba(19, 19, 1, 0.747);
+    padding: 20px;
+    height: 800px;
+  }
+  
+  .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+  }
+  
+  .btn {
+    margin-top: 20px;
+    padding: 10px 25px;
+    background-color: yellow;
+    color: black;
+    font-size: 30px;
+    font-weight: bold;
+    border: 2px solid black;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn:hover {
+    background-color: orange;
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.5);
+  }
+  
+  .btn:after {
+    display: none;
+    font-size: 12px;
+    color: red;
+  }
+  
+  .btn:hover:after {
+    display: inline;
+  }
+  
+  .team-section {
+    margin-top: 15px;
+    padding: 60px 20px;
+    text-align: center;
+    background-color: #013406;
+  }
+  
+  .team-title {
+    font-size: 36px;
+    color: yellow;
+    margin-bottom: 40px;
+  }
+  
+  .team-member {
+    background-color: #034d08;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid yellow;
+    text-align: center;
+  }
+  
+  .team-member img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 20%;
+    margin-bottom: 15px;
+    border: 2px solid white;
+  }
+  
+  .team-member h3 {
+    font-size: 20px;
+    color: white;
+    margin-bottom: 5px;
+  }
+  
+  .team-member p {
+    font-size: 14px;
+    color: #ddd;
+  }
+  /* Responsive Design */
+@media (max-width: 768px) {
+  nav {
+      padding: 15px;
+  }
+
+  .menu {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 70px;
+      right: 10px;
+      background-color: green;
+      padding: 10px;
+      border-radius: 5px;
+  }
+
+  .menu.show {
+      display: flex;
+  }
+
+  .burger {
+      display: flex;
+  }
+
+  .overlay-content {
+      flex-direction: column;
+      text-align: center;
+  }
+
+  .overlay-content img {
+      width: 300px;
+      height: 300px;
+  }
+
+  .text-content h1 {
+      font-size: 22px;
+  }
+
+  .text-content p {
+      font-size: 18px;
+  }
+
+  .team-member img {
+      width: 120px;
+      height: 120px;
+  }
+}
+
+@media (max-width: 524px) {
+  .menu {
+      width: 100%;
+      right: 0;
+  }
+
+  .overlay-content img {
+      width: 250px;
+      height: 250px;
+  }
+
+  .text-content h1 {
+      font-size: 20px;
+  }
+
+  .text-content p {
+      font-size: 16px;
+  }
+
+  .team-member {
+      margin-bottom: 15px;
+  }
+
+  .team-member img {
+      width: 100px;
+      height: 100px;
+  }
+}

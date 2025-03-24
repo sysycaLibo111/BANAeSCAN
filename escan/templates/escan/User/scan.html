@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% extends 'user_base.html' %}
+
+  {% block content %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BananaScan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+  <!-- Bootstrap Icons CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/scan.css">
+</head>
+<body>
+  <div class="content">
+    <h1 style="margin-left: 50px; margin-bottom: 50px; font-weight: bold;">ADMIN DASHBOARD</h1>
+  <div>
+    <div class="overlay-content">
+      <div class="card-container-wrapper">
+        <a href="#" class="card-container">
+          <img src="/static/img/LFT.png" alt="Leaf Disease">
+          <p>Disease Banana Leaf/Fruit/Trunk</p>
+        </a>
+        <a href="" class="card-container">
+          <img src="/static/img/3.png" alt="Banana Variety">
+          <p></p>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔹 Knowledge Section -->
+  <div class="knowledge-section" id="knowledge-section">
+    <h1>KNOWLEDGE</h1>
+    <div class="knowledge-container">
+      <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
+        <img src="/static/img/LFT.png" alt="Leaf Disease">
+        <p>Banana Panama Leaf Disease</p>
+      </div>
+      <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'anama disease, a devastating disease of bananas caused by the soil-inhabiting fungus species Fusarium oxysporum forma specialis cubense. A form of fusarium wilt, Panama disease is widespread throughout the tropics and can be found wherever susceptible banana cultivars are grown. Notoriously difficult to control, the disease decimated global plantations of the Gros Michel banana in the 1950s and ’60s, which had dominated the commercial industry until its downfall. Its replacement, the modern Cavendish, has been threatened with a strain of the disease known as Tropical Race (TR) 4 since the 1990s; in 2019 TR 4 was confirmed in Colombia, marking the first appearance of the strain in the Americas. The Fusarium fungus invades young roots or root bases, often through wounds. Some infections progress into the rhizome (rootlike stem), followed by rapid invasion of the rootstock and leaf bases. Spread occurs through vascular bundles, which become discoloured brown or dark red, and finally purplish or black. The outer edges of older leaves turn yellow. Within a month or two, all but the youngest leaves turn yellow, wilt, collapse, and hang downward, covering the trunk (pseudostem) with dead brown leaves. All aboveground parts are eventually killed, although fresh shoots may form at the base. ')">
+        <img src="/static/img/3.png" alt="Banana Variety">
+        <p>Banana Anthracnose Fruit disease</p>
+      </div>
+      <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
+        <img src="/static/img/3.png" alt="Banana Variety">
+        <p>Banana Cordana Leaf Disease</p>
+      </div>
+      <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
+        <img src="/static/img/LFT.png" alt="Leaf Disease">
+        <p>Banana Insect Pest Leaf Disease</p>
+      </div>
+    </div>
+    <div class="knowledge-container" style="margin-top: 40px;">
+        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
+          <img src="/static/img/3.png" alt="Banana Variety">
+          <p>Banana Pestalotiopsis Leaf Disease</p>
+        </div>
+        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
+          <img src="/static/img/3.png" alt="Banana Variety">
+          <p>Banana Naturally Leaf Dead</p>
+        </div>
+        <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
+          <img src="/static/img/LFT.png" alt="Leaf Disease">
+          <p>Banana Sigatoka Leaf Disease</p>
+        </div>
+        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
+          <img src="/static/img/3.png" alt="Banana Variety">
+          <p>Banana Rhizome Root Tree Disease</p>
+        </div>
+      </div>
+      <div class="knowledge-container" style="margin-top: 40px;">
+        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
+          <img src="/static/img/3.png" alt="Banana Variety">
+          <p>Banana Fusarium Wilt Tree Disease</p>
+        </div>
+        <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
+          <img src="/static/img/LFT.png" alt="Leaf Disease">
+          <p>Banana Bract Mosaic Virus Disease</p>
+        </div>
+      </div>
+  </div>
+
+  <!-- 🔹 Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h2 id="modal-title"></h2>
+      <img id="modal-img" src="" alt="">
+      <p id="modal-text"></p>
+    </div>
+  </div>
+
+
+<!-- 🔹 Team Section -->
+<div class="team-section" id="team">
+    <h1 class="team-title">Meet the Team</h1>
+    <div class="team-container">
+        <div class="team-member">
+            <img src="/static/img/sy.png" alt="Syren D. Calibo">
+            <h3>Syren D. Calibo</h3>
+            <p>Project Leader & Developer</p>
+        </div>
+        <div class="team-member">
+            <img src="/static/img/jim.png" alt="Jimmilyn H. Pascua">
+            <h3>Jimmilyn H. Pascua</h3>
+            <p>UI/UX Designer</p>
+        </div>
+        <div class="team-member">
+            <img src="/static/img/mar.png" alt="Mary Rose U. Pardilla">
+            <h3>Mary Rose U. Pardilla</h3>
+            <p>Database Specialist</p>
+        </div>
+    </div>
+</div>
+
+<!-- Footer-->
+<footer class="py-5 bg-dark">
+  <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
+</footer>
+
+</div>
+  <script>
+    // 🔹 Logout Confirmation
+function confirmLogout() {
+    let confirmAction = confirm("Are you sure you want to logout?");
+    if (confirmAction) {
+        window.location.href = "{% url 'logout' %}"; 
+    }
+}
+
+// Open Modal
+function openModal(title, imgSrc, text) {
+    document.getElementById("modal-title").innerText = title;
+    document.getElementById("modal-img").src = imgSrc;
+    document.getElementById("modal-text").innerText = text;
+    document.getElementById("modal").style.display = "flex"; // ✅ Show modal correctly
+}
+
+// Close Modal
+function closeModal() {
+    document.getElementById("modal").style.display = "none"; // ✅ Hide modal properly
+}
+// 🔹 Burger Menu Toggle
+document.addEventListener("DOMContentLoaded", function() {
+    const burger = document.querySelector(".burger");
+    const menu = document.querySelector(".menu");
+
+    burger.addEventListener("click", function() {
+        menu.classList.toggle("show");
+    });
+});
+
+  </script>
+
+
+</body>
+</html>
+{% endblock %}
