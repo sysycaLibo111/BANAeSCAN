@@ -3,30 +3,31 @@ from escan import views
 from django.conf import settings
 from django.conf.urls.static import static
 from escan.views import login_view, user_dashboard
-from .views import upload_product
+
 
 urlpatterns = [
     path('', views.landing_page, name='landing_page'),
     path('accounts/', include('allauth.urls')),
-    # for user
     path("login/", views.login_view, name="login"),
     path("signup_view/", views.signup_view, name="signup_view"), 
+    
+    # for user
     path("user_dashboard/", views.user_dashboard, name="user_dashboard"),
     path("user_base/", views.user_base, name="user_base"),
     path("scan/", views.scan, name="scan"),
     
     # for admin
-    path("admin_login/", views.admin_login, name="admin_login"),
-    path("admin_signup/", views.admin_signup, name="admin_signup"), 
-    path("base/", views.base, name="base"),
     path("admin_dashboard/", views.admin_dashboard, name="admin_dashboard"),
+    path("update_profile/", views.update_profile, name="update_profile"),
     
     # User list Management
     path("user_table/", views.user_table, name="user_table"),
     path("add_user/", views.add_user, name="add_user"),
     path("edit_user/<int:user_id>/", views.edit_user, name="edit_user"),
     path("delete_user/<int:user_id>/", views.delete_user, name="delete_user"),
-    path("undo_delete/", views.undo_delete, name="undo_delete"),
+    path("undo_last_action_user/", views.undo_last_action_user, name="undo_last_action_user"),
+    path('search_users/', views.search_users, name='search_users'),
+    path('user_print/', views.user_print, name='user_print'),
 
      # Categories
     path('categories/', views.category_list, name='category_list'),
@@ -34,16 +35,33 @@ urlpatterns = [
     path('edit-category/<int:category_id>/', views.edit_category, name='edit_category'),
     path('delete-category/<int:category_id>/', views.delete_category, name='delete_category'),
 
-    # # Products
-    path('upload/', upload_product, name='upload_product'),
+    #  Products
     path('products/', views.product_list, name='product_list'),
     path('add_product/', views.add_product, name='add_product'),
     path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
     path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
-    path('restore-product/<int:product_id>/', views.restore_product, name='restore_product'),
+    path('undo/', views.undo_last_action, name='undo_last_action'),
+    path('search_products/', views.search_products, name='search_products'),
+    path('product_print/', views.product_print, name='product_print'),
 
 
+    # Oders
+    path('orders_part/', views.orders_part, name='orders_part'),
+    path('user_product_list/', views.user_product_list, name='user_product_list'),
+    path('cart/', views.cart, name = 'cart'),
+    # path('add_to_cart/<int:product_id>/', add_to_cart, name='add_to_cart'),
+    # Customers
+    path("customer_table/", views.customer_table, name="customer_table"),
     
+    #Graphs
+     path('user_graph/', views.user_graph_view, name='user_graph'),
+
+
+    #  User Parts
+      path("update_userprofile/", views.update_userprofile, name="update_userprofile"),
+
+    # Scan Parts
+    path("detect/", views.detect, name="detect"), 
     # try lang
     # path("admin-dashboard/", views.admin_dashboard_view, name="admin_dashboard"),  # Admin dashboard view
     # path("farmer-dashboard/", views.farmer_dashboard_view, name="farmer_dashboard"),  # Farmer dashboard view

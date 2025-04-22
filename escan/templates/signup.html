@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - BANAeScan</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #fff8dc;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: url("{% static 'img/bc1.png' %}") no-repeat center/cover;
+      width: 600px;
+      height: auto;
+      padding: 30px;
+      border-radius: 18px;
+      box-shadow: 0 6px 12px rgba(215, 102, 3, 0.883);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      padding: 15px;
+      color: black;
+      border: none;
+      background-color: #aaaaaa00;
+      border-radius: 12px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+
+    .translate-button {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      padding: 10px 15px;
+      font-size: 14px;
+      border: none;
+      background-color: #d4a017;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .form-container {
+      width: 85%;
+      background-color: rgba(17, 62, 4, 0.75);
+      padding: 40px;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .form-title {
+      font-size: 28px;
+      font-weight: bold;
+      color: #d4a017;
+      margin-bottom: 20px;
+    }
+
+    .input-group {
+      width: 5in;
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      width: 100%;
+      font-size: 18px;
+      height: 55px;
+      padding: 15px;
+      border: 1.5px solid #aaa;
+      border-radius: 7px;
+      outline: none;
+      box-sizing: border-box;
+    }
+
+    .input-group label {
+      color: #fff;
+      margin-bottom: 6px;
+      display: block;
+      font-weight: bold;
+    }
+
+    .btn {
+      width: 100%;
+      height: 60px;
+      font-size: 20px;
+      border: none;
+      border-radius: 7px;
+      color: #fff;
+      background-color: #d4a017;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #b8860b;
+    }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 10px 0;
+      width: 100%;
+    }
+
+    .separator .line {
+      flex: 1;
+      height: 1.5px;
+      background-color: #ccc;
+      border: none;
+    }
+
+    .separator span {
+      margin: 0 12px;
+      color: #fff;
+    }
+
+    .login-link {
+      text-align: center;
+      font-size: 18px;
+      color: white;
+      margin-top: 20px;
+    }
+
+    .login-link a {
+      color: #d4a017;
+      text-decoration: none;
+    }
+
+    .message-container {
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .error-message h4,
+    .info-message h4 {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <button class="close-button" onclick="toggleLanguage()" style="top: 50px; right: 50px; background-color: #e4b337;font-family: 'Times New Roman', Times, serif;">PH</button>
+    <div class="form-container">
+      <button class="close-button" onclick="window.location.href='{% url 'landing_page' %}'">X</button>
+      <h1 class="form-title" id="formTitle">Sign Up</h1>
+
+      {% if messages %}
+        <div class="message-container">
+          {% for message in messages %} 
+            {% if message.tags == 'error' %}
+              <div class="error-message">
+                <h4>{{ message }}</h4>
+              </div>
+            {% else %}
+              <div class="info-message">
+                <h4>{{ message }}</h4>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      
+      <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="input-group">
+          <input type="text" name="first_name" placeholder="First Name" id="firstName" required>
+        </div>
+        <div class="input-group">
+          <input type="text" name="last_name" placeholder="Last Name" id="lastName" required>
+        </div>
+        <div class="input-group">
+          <input type="text" name="username" placeholder="Username" id="username" required>
+        </div>
+        <div class="input-group">
+          <input type="email" name="email" placeholder="Email" id="email" required>
+        </div>
+        <div class="input-group">
+          <input type="password" name="password" placeholder="Password" id="password" required>
+        </div>
+        <div class="input-group">
+          <label for="image_url" class="form-label" id="imageLabel">Product Image</label>
+          <input type="file" name="image_url">
+        </div>
+        <div class="input-group">
+          <input type="hidden" name="role" value="User">
+        </div>
+        
+        <button type="submit" class="btn" id="submitBtn">Sign Up</button>
+      </form>
+
+      <p class="login-link" id="loginText">Already have an account? <a href="{% url 'login' %}" id="loginLink">Login here</a></p>
+      <div class="separator">
+        <hr class="line">
+        <span>OR</span>
+        <hr class="line">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isTagalog = false;
+
+    function toggleLanguage() {
+      isTagalog = !isTagalog;
+      document.getElementById("formTitle").textContent = isTagalog ? "Mag Sign Up" : "Sign Up";
+      document.getElementById("firstName").placeholder = isTagalog ? "Pangalan" : "First Name";
+      document.getElementById("lastName").placeholder = isTagalog ? "Apelyido" : "Last Name";
+      document.getElementById("username").placeholder = isTagalog ? "Username" : "Username";
+      document.getElementById("email").placeholder = isTagalog ? "Email" : "Email";
+      document.getElementById("password").placeholder = isTagalog ? "Password" : "Password";
+      document.getElementById("submitBtn").textContent = isTagalog ? "Mag-sign Up" : "Sign Up";
+      document.getElementById("loginText").innerHTML = isTagalog
+        ? "Mayroon ka na bang account? <a href='{% url 'login' %}' id='loginLink'>Mag-login dito</a>"
+        : "Already have an account? <a href='{% url 'login' %}' id='loginLink'>Login here</a>";
+      document.getElementById("imageLabel").textContent = isTagalog ? "Larawan ng Produkto" : "Product Image";
+
+      // Change button label itself
+      document.querySelector(".translate-button").textContent = isTagalog ? "English" : "Tagalog";
+    }
+  </script>
+</body>
+</html>

@@ -1,164 +1,565 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  {% extends 'user_base.html' %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCAN SIDE</title>
+    <!-- External Libraries -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
 
-  {% block content %}
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BananaScan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
-  <!-- Bootstrap Icons CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/scan.css">
+        nav.sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100vh;
+            background-color: #c1b22e;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        nav .logo-container {
+            margin-left: 50px;
+            align-items: center;
+        }
+
+        nav .logo {
+            width: 150px;
+            padding: 5px;
+            border-radius: 50%;
+            border: 2px solid rgb(231, 235, 231);
+            height: auto;
+        }
+
+        nav .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+
+        nav .menu a {
+            color: black;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        nav .menu a:hover {
+            background-color: white;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            width: 270px;
+            height: 50px;
+            color: green;
+        }
+
+        .card-container-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin: 30px;
+        }
+
+        .card-container {
+            width: 10in;
+            height: 10%;
+            gap: 50px;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: rgb(46, 165, 10);
+            text-align: center;
+            margin-bottom: 4in;
+        }
+
+        .card-container img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .card-container p {
+            font-size: 30px;
+            margin-top: 10px;
+            color: black;
+            text-decoration: none;
+        }
+
+        .team-section {
+            margin-top: 2in;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .team-title {
+            font-weight: bold;
+            margin-bottom: 0.5in;
+        }
+
+        .team-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .team-member {
+            background-color: #4e7145;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid yellow;
+            text-align: center;
+            width: 3in;
+        }
+
+        .team-member img {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 2px solid white;
+        }
+
+        .team-member h3 {
+            font-size: 20px;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .team-member p {
+            font-size: 20px;
+            color: #ddd;
+        }
+        .team-section h1 {
+            font-weight: bold;
+        }
+
+        
+        /* .nav-bar {
+        display: flex;
+        justify-content: space-between; 
+        align-items: center; 
+        padding: 10px 20px; 
+       background-color: #f8f9fa; 
+       border-bottom: 1px solid #ddd; 
+       position: sticky;
+        } */
+        .nav-bar {
+    display: flex;
+    justify-content: end; 
+    align-items: center; 
+    padding: 10px 20px; 
+    gap: 20px;
+    background-color: #f8f9fa; 
+    border-bottom: 1px solid #ddd; 
+    margin-left: 300px; 
+    height: 100px;
+    position: sticky;
+    top: 0;
+}
+        .search-box {
+         justify-self: end;
+         font-size: 25px;
+         color: white;
+    
+        }
+        
+        .search-box input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #0a0606;
+            margin-left: 14n;
+        }
+
+        /* Existing styles for other sections like logo-container, menu, and content */
+        .content { margin-left: 300px; padding: 20px; transition: margin-left 0.3s; margin-top: 1in; }
+        .knowledge-section { text-align: center; margin-top: 100px; color: black; }
+        .knowledge-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 50px; }
+        .knowledge-card { width: 6in; height: 4in;  background-color: rgb(46, 165, 10); border-radius: 10px;  padding: 10px; text-align: center; cursor: pointer; color: black; }
+        .knowledge-card img { width: 100%; height: 80%; border-radius: 5px; object-fit: cover; }
+        .knowledge-card p { font-size: 30px; margin-top: 5px; }
+
+        /* Modal */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; overflow-y: auto; }
+        .modal-content { background-color:  white; padding: 20px; border-radius: 10px; width: 80%; max-width: 900px; text-align: center; animation: scaleUp 0.3s ease-in-out; }
+        @keyframes scaleUp { from { transform: scale(0.7); } to { transform: scale(1); } }
+        .modal-content p { text-align: justify; margin-bottom: 20px; }
+        .close { float: right; font-size: 28px; cursor: pointer; }
+
+        /* Pagination Styles */
+        .pagination { display: flex; justify-content: center; gap: 30px; margin-top: 30px; }
+        .page-item { list-style: none; gap: 20px; }
+        .page-link { cursor: pointer; padding: 10px 20px; background-color:  #eb9c25; color: black; border: none; border-radius: 5px; font-size: 30px;}
+        .page-link:hover { background-color: #eff2f5; border: 1px solid  #eb9c25; }
+        .page-links { cursor: pointer; padding: 10px 20px; background-color:  #eb9c25; color: black; border: none; border-radius: 5px;font-size: 30px; }
+        .page-links:hover { background-color: #edeef0; border: 1px solid  #eb9c25;}
+
+
+    </style>
 </head>
 <body>
-  <div class="content">
-    <h1 style="margin-left: 50px; margin-bottom: 50px; font-weight: bold;">ADMIN DASHBOARD</h1>
-  <div>
-    <div class="overlay-content">
-      <div class="card-container-wrapper">
-        <a href="#" class="card-container">
-          <img src="/static/img/LFT.png" alt="Leaf Disease">
-          <p>Disease Banana Leaf/Fruit/Trunk</p>
-        </a>
-        <a href="" class="card-container">
-          <img src="/static/img/3.png" alt="Banana Variety">
-          <p></p>
-        </a>
-      </div>
+    <nav class="sidebar">
+        <div class="logo-container">
+            <img src="{% static 'img/LogoW.png' %}" alt="Logo" class="logo">
+        </div>
+        <div class="menu">
+          <a href="{% url 'user_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Home</a>
+          <a href="#"><i class="fas fa-shopping-cart"></i> Order</a>
+          <a href="#"><i class="fas fa-truck"></i> To Ship</a>
+          <a href="#"><i class="fas fa-money-bill-wave"></i> Transactions</a>
+          <a href="{% url 'scan' %}"><i class="fas fa-qrcode"></i> Scan Now</a>
+          <a href="#knowledge-section"><i class="fas fa-book-open"></i> Library</a>
+          <a href="#Team"><i class="fas fa-users"></i> Team</a>
+
+        </div>
+        <div class="burger" id="burger" onclick="toggleNav()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </nav>
+    <div class="nav-bar">
+        <P style=" font-weight: bold; font-size: 25px;padding: 15px; justify-items: start; margin-left: 5in; color: black;"></P>
+        <div class="search-box">
+            <input type="text" id="searchBox" placeholder="Search...">
+            <button class="btn btn-outline-primary" style="font-size: 28px;" onclick="searchUser()" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Hanapin ang Tao">Search</button>
+        </div>
+        <div class="icons">
+            <div class="logout-icon" onclick="toggleLogout()" style="cursor: pointer; font-size: 35px; margin-bottom: 10px; margin-top: 20px; margin-right: 10px;">
+              <a href="{% url 'logout' %}" class="text-danger"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </div>
+        
     </div>
-  </div>
+    <div class="content">
 
-  <!-- 🔹 Knowledge Section -->
-  <div class="knowledge-section" id="knowledge-section">
-    <h1>KNOWLEDGE</h1>
-    <div class="knowledge-container">
-      <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
-        <img src="/static/img/LFT.png" alt="Leaf Disease">
-        <p>Banana Panama Leaf Disease</p>
-      </div>
-      <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'anama disease, a devastating disease of bananas caused by the soil-inhabiting fungus species Fusarium oxysporum forma specialis cubense. A form of fusarium wilt, Panama disease is widespread throughout the tropics and can be found wherever susceptible banana cultivars are grown. Notoriously difficult to control, the disease decimated global plantations of the Gros Michel banana in the 1950s and ’60s, which had dominated the commercial industry until its downfall. Its replacement, the modern Cavendish, has been threatened with a strain of the disease known as Tropical Race (TR) 4 since the 1990s; in 2019 TR 4 was confirmed in Colombia, marking the first appearance of the strain in the Americas. The Fusarium fungus invades young roots or root bases, often through wounds. Some infections progress into the rhizome (rootlike stem), followed by rapid invasion of the rootstock and leaf bases. Spread occurs through vascular bundles, which become discoloured brown or dark red, and finally purplish or black. The outer edges of older leaves turn yellow. Within a month or two, all but the youngest leaves turn yellow, wilt, collapse, and hang downward, covering the trunk (pseudostem) with dead brown leaves. All aboveground parts are eventually killed, although fresh shoots may form at the base. ')">
-        <img src="/static/img/3.png" alt="Banana Variety">
-        <p>Banana Anthracnose Fruit disease</p>
-      </div>
-      <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
-        <img src="/static/img/3.png" alt="Banana Variety">
-        <p>Banana Cordana Leaf Disease</p>
-      </div>
-      <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
-        <img src="/static/img/LFT.png" alt="Leaf Disease">
-        <p>Banana Insect Pest Leaf Disease</p>
-      </div>
+        <h2 style="text-align: center; margin-bottom: 20px;" title="Galugarin ang Aming Scanning Kagamitang Pang-Agrikultura">
+            Explore Our Scan Agriculture Tools<br>
+            <small 
+                style="font-weight: normal; font-size: 25px;" 
+                title="I-scan at tukuyin ang mga sakit sa saging o kilalanin agad ang uri ng saging. Tinutulungan ng aming sistema ang mga magsasaka na makagawa ng matalinong desisyon sa ilang pag-click lang.">
+                Scan and detect diseases in banana plants or identify banana varieties instantly. 
+                Our system helps farmers make informed decisions in just a few clicks.
+            </small>
+        </h2>
+        
+        <div class="overlay-content">
+            <div class="card-container-wrapper">
+                <!-- Banana Disease Scanner -->
+                <a href="{% url 'scan' %}" class="card-container" style="text-decoration: none;">
+                    <img src="/static/img/Disease.gif" alt="Leaf Disease">
+                    <p title="I-scan ang dahon/prutas/puno ng saging para sa sakit">Scan Disease Banana Leaf/Fruit/Trunk</p>
+                </a>
+    
+                <!-- Banana Variety Scanner -->
+                <a href="{% url 'scan' %}" class="card-container" style="text-decoration: none;">
+                    <img src="/static/img/Variety.gif" alt="Banana Variety">
+                    <p title="I-scan upang makilala ang uri ng saging">Scan Banana Variety</p>
+                </a>
+            </div>
+        </div>
+        <!-- Knowledge Section -->
+        <div class="knowledge-section" id="knowledge-section">
+            <h1 style="margin-bottom: 0.5in; font-weight: bold;">LIBRARY</h1>
+
+            <div class="knowledge-container" id="knowledge-container">
+                <!-- Cards will be injected dynamically here -->
+            </div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination">
+                <button class="page-links" onclick="changePage('prev')">Previous</button>
+                <button class="page-link" onclick="changePage('next')">Next</button>
+            </div>
+
+        </div>
+
+        <!-- Modal -->
+        <div id="modal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick="closeModal()" style="margin-left: 8in; font-size: 25;">&times;</span>
+                <h2 id="modal-title"></h2>
+                <img id="modal-img" src="" alt="">
+                <p id="modal-text" style="font-size: 25px;"></p>
+            </div>
+        </div>
+        <!-- Team Section -->
+        <div class="team-section" id="team">
+            <h1 class="team-title">MEET THE TEAM</h1>
+            <div class="team-container">
+                <div class="team-member">
+                    <img src="/static/img/sy.png" alt="Syren D. Calibo">
+                    <h3>Syren D. Calibo</h3>
+                    <p>Project Leader & Developer</p>
+                </div>
+                <div class="team-member">
+                    <img src="/static/img/jim.png" alt="Jimmilyn H. Pascua">
+                    <h3>Jimmilyn H. Pascua</h3>
+                    <p>UI/UX Designer</p>
+                </div>
+                <div class="team-member">
+                    <img src="/static/img/mar.png" alt="Mary Rose U. Pardilla">
+                    <h3>Mary Rose U. Pardilla</h3>
+                    <p>Database Specialist</p>
+                </div>
+            </div>
+        </div>
+        <!-- Footer -->
+
     </div>
-    <div class="knowledge-container" style="margin-top: 40px;">
-        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
-          <img src="/static/img/3.png" alt="Banana Variety">
-          <p>Banana Pestalotiopsis Leaf Disease</p>
-        </div>
-        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
-          <img src="/static/img/3.png" alt="Banana Variety">
-          <p>Banana Naturally Leaf Dead</p>
-        </div>
-        <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
-          <img src="/static/img/LFT.png" alt="Leaf Disease">
-          <p>Banana Sigatoka Leaf Disease</p>
-        </div>
-        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
-          <img src="/static/img/3.png" alt="Banana Variety">
-          <p>Banana Rhizome Root Tree Disease</p>
-        </div>
-      </div>
-      <div class="knowledge-container" style="margin-top: 40px;">
-        <div class="knowledge-card" onclick="openModal('Banana Variety', '/static/img/3.png', 'Information about Banana Varieties...')">
-          <img src="/static/img/3.png" alt="Banana Variety">
-          <p>Banana Fusarium Wilt Tree Disease</p>
-        </div>
-        <div class="knowledge-card" onclick="openModal('Banana Leaf Disease', '/static/img/LFT.png', 'Details about Banana Leaf Disease...')">
-          <img src="/static/img/LFT.png" alt="Leaf Disease">
-          <p>Banana Bract Mosaic Virus Disease</p>
-        </div>
-      </div>
-  </div>
+    <script>
+            const knowledgeData = [
+    {
+        title: 'Banana Panama Leaf Disease',
+        img: '/static/img/diseaseLib/Panama.png',
+        text: `Definition:  
+Panama Disease, also known as Fusarium wilt, is a soil-borne fungal disease caused by Fusarium oxysporum f.sp. cubense. It attacks the banana plant through its roots, causing yellowing and wilting of leaves.
 
-  <!-- 🔹 Modal -->
-  <div id="modal" class="modal">
-    <div class="modal-content">
-      <span class="close" onclick="closeModal()">&times;</span>
-      <h2 id="modal-title"></h2>
-      <img id="modal-img" src="" alt="">
-      <p id="modal-text"></p>
-    </div>
-  </div>
+Control & Prevention:  
+- Use resistant banana varieties like Cavendish.  
+- Practice crop rotation and avoid planting bananas in infected soil.  
+- Remove and burn infected plants.  
+- Improve soil drainage and avoid overwatering.  
+- Disinfect tools and equipment to prevent spread.`
 
+    },
+    {
+        title: 'Banana Anthracnose Fruit Disease',
+        img: '/static/img/diseaseLib/Anthracnose.png',
+        text: `Definition:  
+Anthracnose is a fungal disease caused by *Colletotrichum musae*, affecting banana fruits with black sunken spots, leading to fruit rot during storage and transport.
 
-<!-- 🔹 Team Section -->
-<div class="team-section" id="team">
-    <h1 class="team-title">Meet the Team</h1>
-    <div class="team-container">
-        <div class="team-member">
-            <img src="/static/img/sy.png" alt="Syren D. Calibo">
-            <h3>Syren D. Calibo</h3>
-            <p>Project Leader & Developer</p>
-        </div>
-        <div class="team-member">
-            <img src="/static/img/jim.png" alt="Jimmilyn H. Pascua">
-            <h3>Jimmilyn H. Pascua</h3>
-            <p>UI/UX Designer</p>
-        </div>
-        <div class="team-member">
-            <img src="/static/img/mar.png" alt="Mary Rose U. Pardilla">
-            <h3>Mary Rose U. Pardilla</h3>
-            <p>Database Specialist</p>
-        </div>
-    </div>
-</div>
+Control & Prevention: 
+- Avoid physical damage to fruits during harvesting and handling.  
+- Use fungicides like Mancozeb or Thiophanate-methyl before fruit maturity.  
+- Store bananas in cool, dry environments.  
+- Use hot water treatment (50°C for 20 minutes) to reduce postharvest infections.`
+    },
+    {
+        title: 'Banana Cordana Leaf Disease',
+        img: '/static/img/diseaseLib/Cordana.png',
+        text: `Definition: 
+Cordana Leaf Spot, caused by *Cordana musae*, presents as brown spots with yellow halos on older leaves, which eventually dry out and die.
 
-<!-- Footer-->
-<footer class="py-5 bg-dark">
-  <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2023</p></div>
-</footer>
+Control & Prevention: 
+- Regularly remove and burn infected leaves.  
+- Improve air circulation by proper spacing of plants.  
+- Apply preventive fungicides like copper-based sprays.  
+- Maintain field sanitation to reduce spore buildup.`
+    },
+    {
+        title: 'Banana Insect Pest Leaf Disease',
+        img: '/static/img/diseaseLib/Pest.png',
+        text: `Definition:  
+Banana leaves are vulnerable to pests such as banana aphids, weevils, and spider mites, which feed on leaf tissue and spread viruses like BBTV.
 
-</div>
-  <script>
-    // 🔹 Logout Confirmation
-function confirmLogout() {
-    let confirmAction = confirm("Are you sure you want to logout?");
-    if (confirmAction) {
-        window.location.href = "{% url 'logout' %}"; 
+Control & Prevention: 
+- Use insecticidal soap or neem oil for mild infestations.  
+- Introduce natural predators like ladybugs.  
+- Remove heavily infested leaves.  
+- Monitor regularly and apply systemic insecticides if necessary.`
+    },
+    {
+        title: 'Banana Pestalotiopsis Leaf Disease',
+        img: '/static/img/diseaseLib/Pestalotiopsis.png',
+        text: `Definition: 
+Caused by *Pestalotiopsis microspora*, this fungal disease creates grayish-brown spots on leaves with dark margins and black fruiting bodies.
+
+Control & Prevention:  
+- Apply foliar fungicides such as Chlorothalonil or Copper Oxychloride.  
+- Remove infected plant debris from the field.  
+- Improve sunlight exposure and reduce humidity around plants.  
+- Use disease-free planting material.`
+    },
+    {
+        title: 'Banana Naturally Leaf Dead',
+        img: '/static/img/diseaseLib/Naturally Leaf Dead.png',
+        text: `Definition: 
+This is a natural process where older banana leaves die off to allow new growth. It is not caused by pathogens but by the plant's life cycle.
+
+Control & Prevention: 
+- No control needed unless combined with disease symptoms.  
+- Prune old, dry leaves regularly to maintain plant hygiene.  
+- Ensure the plant receives balanced nutrients to support healthy growth.`
+    },
+    {
+        title: 'Banana Sigatoka Leaf Disease',
+        img: '/static/img/diseaseLib/sigatoka.png',
+        text: `Definition: 
+Sigatoka is a fungal leaf spot disease caused by *Mycosphaerella musicola* (Yellow Sigatoka) or *Mycosphaerella fijiensis* (Black Sigatoka), reducing photosynthesis and yield.
+
+Control & Prevention:  
+- Remove and destroy infected leaves.  
+- Apply protective fungicides like Propiconazole or Mancozeb.  
+- Use resistant banana cultivars.  
+- Ensure good drainage and air circulation.`
+    },
+    {
+        title: 'Banana Rhizome Root Tree Disease',
+        img: '/static/img/diseaseLib/Root.png',
+        text: `Definition: 
+Also known as rhizome rot, it is commonly caused by *Erwinia* spp. or nematodes that damage the underground part of the plant, leading to stunted growth and wilting.
+
+Control & Prevention:  
+- Use nematode-free and disease-free suckers.  
+- Improve soil aeration and drainage.  
+- Apply biological control agents like *Trichoderma*.  
+- Avoid waterlogging and rotate crops.`
+    },
+    {
+        title: 'Banana Fusarium Wilt Tree Disease',
+        img: '/static/img/diseaseLib/Wilt.png',
+        text: `Definition:
+Fusarium wilt is a devastating fungal disease caused by *Fusarium oxysporum f.sp. cubense*. It affects the vascular system, leading to yellowing, leaf collapse, and plant death.
+
+Control & Prevention:  
+- Use tissue-cultured and resistant banana varieties.  
+- Uproot and destroy infected plants immediately.  
+- Do not reuse soil from infected areas.  
+- Maintain clean tools and limit movement between fields.`
+    },
+    {
+        title: 'Banana Bract Mosaic Virus Disease',
+        img: '/static/img/diseaseLib/Bract Mosaic Virus Disease.png',
+        text: `Definition:
+This viral disease, spread by aphids, causes streaks or mosaic patterns on bracts, pseudostems, and leaves. It leads to reduced fruit quality and plant vigor.
+
+Control & Prevention:
+- Use virus-free planting materials.  
+- Control aphid populations using insecticides or neem extracts.  
+- Rogue and destroy infected plants.  
+- Avoid planting bananas near infected fields.`
     }
-}
-
-// Open Modal
-function openModal(title, imgSrc, text) {
-    document.getElementById("modal-title").innerText = title;
-    document.getElementById("modal-img").src = imgSrc;
-    document.getElementById("modal-text").innerText = text;
-    document.getElementById("modal").style.display = "flex"; // ✅ Show modal correctly
-}
-
-// Close Modal
-function closeModal() {
-    document.getElementById("modal").style.display = "none"; // ✅ Hide modal properly
-}
-// 🔹 Burger Menu Toggle
-document.addEventListener("DOMContentLoaded", function() {
-    const burger = document.querySelector(".burger");
-    const menu = document.querySelector(".menu");
-
-    burger.addEventListener("click", function() {
-        menu.classList.toggle("show");
-    });
-});
-
-  </script>
+];
 
 
+
+        let currentPage = 0;
+        const itemsPerPage = 6;
+
+        function renderKnowledgeCards() {
+            const startIndex = currentPage * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentPageData = knowledgeData.slice(startIndex, endIndex);
+            const container = document.getElementById('knowledge-container');
+            container.innerHTML = ''; // Clear previous cards
+
+            currentPageData.forEach(item => {
+                const card = document.createElement('div');
+                card.classList.add('knowledge-card');
+                card.onclick = () => openModal(item.title, item.img, item.text);
+                card.innerHTML = `
+                    <img src="${item.img}" alt="${item.title}">
+                    <p>${item.title}</p>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openModal(title, img, text) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-img').src = img;
+            document.getElementById('modal-text').innerText = text;
+            document.getElementById('modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        function changePage(direction) {
+            if (direction === 'next') {
+                if ((currentPage + 1) * itemsPerPage < knowledgeData.length) {
+                    currentPage++;
+                }
+            } else if (direction === 'prev') {
+                if (currentPage > 0) {
+                    currentPage--;
+                }
+            }
+            renderKnowledgeCards();
+        }
+
+        // Initialize the first page
+        renderKnowledgeCards();
+      
+
+        function toggleNav() {
+            const sidebar = document.querySelector('nav.sidebar');
+            const content = document.querySelector('.content');
+
+            if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+                sidebar.style.display = 'flex'; // Show sidebar
+                content.style.marginLeft = '250px'; // Reset content margin
+            } else {
+                sidebar.style.display = 'none'; // Hide sidebar
+                content.style.marginLeft = '0'; // Full width for content
+            }
+        }
+
+        function toggleMessages() {
+            // Logic to show/hide messages dropdown
+        }
+
+        function toggleNotifications() {
+            // Logic to show/hide notifications dropdown
+        }
+
+        function toggleProfile() {
+            var dropdown = document.getElementById("profileDropdown");
+            dropdown.style.display = dropdown.style.display === "none" ? "block" : "none";
+        }
+
+        // Open Modal
+        function openModal(title, imgSrc, text) {
+            document.getElementById("modal-title").innerText = title;
+            document.getElementById("modal-img").src = imgSrc;
+            document.getElementById("modal-text").innerText = text;
+            document.getElementById("modal").style.display = "flex"; // Show modal correctly
+        }
+
+        // Close Modal
+        function closeModal() {
+            document.getElementById("modal").style.display = "none"; // Hide modal properly
+        }
+
+        // Burger Menu Toggle
+        document.addEventListener("DOMContentLoaded", function () {
+            const burger = document.querySelector(".burger");
+            const menu = document.querySelector(".menu");
+
+            burger.addEventListener("click", function () {
+                menu.classList.toggle("show");
+            });
+        });
+
+        function toggleLogout() {
+            let confirmAction = confirm("Are you sure you want to logout?");
+            if (confirmAction) {
+                window.location.href = "{% url 'logout' %}";
+            }
+        }
+    </script>
 </body>
 </html>
-{% endblock %}

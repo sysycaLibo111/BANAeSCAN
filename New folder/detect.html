@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Cacao Disease Detection - AI-powered tool to identify diseases and pests in cacao plants">
+    <meta name="keywords" content="cacao, disease detection, pest detection, AI, machine learning, plant health">
+    <meta property="og:title" content="Cacao Disease Detection">
+    <meta property="og:description" content="AI-powered tool to identify diseases and pests in cacao plants">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Cacao Disease Detection">
+    <meta name="twitter:description" content="AI-powered tool to identify diseases and pests in cacao plants">
+    <title>Cacao Disease Detection</title>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react@18/umd/react.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://resource.trickle.so/vendor_lib/unpkg/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <style>
+        .upload-area {
+            transition: all 0.3s ease;
+        }
+        .preview-image {
+            max-height: 300px;
+            object-fit: contain;
+        }
+        .history-card {
+            transition: transform 0.2s ease;
+        }
+        .history-card:hover {
+            transform: translateY(-2px);
+        }
+        .confidence-bar {
+            transition: width 0.6s ease;
+        }
+        .loading-spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="root"></div>
+    <script type="text/babel">
+        function App() {
+            const [analysisResult, setAnalysisResult] = React.useState(null);
+            const [loading, setLoading] = React.useState(false);
+            const [history, setHistory] = React.useState([]);
+
+            React.useEffect(() => {
+                setHistory(loadHistory());
+            }, []);
+
+            const handleImageSelect = async (file) => {
+                if (!file) {
+                    setAnalysisResult(null);
+                    return;
+                }
+
+                setLoading(true);
+                try {
+                    const result = await analyzeImage(file);
+                    setAnalysisResult(result);
+
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        const updatedHistory = saveToHistory(result, reader.result);
+                        setHistory(updatedHistory);
+                    };
+                    reader.readAsDataURL(file);
+                } catch (error) {
+                    console.error('Error processing image:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="container mx-auto px-4 py-8">
+                    <Header />
+                    <main className="mt-8">
+                        <ImageUpload onImageSelect={handleImageSelect} />
+                        <AdminNotification result={analysisResult} />
+                        <AnalysisResult result={analysisResult} loading={loading} />
+                        <HistoryList history={history} />
+                    </main>
+                </div>
+            );
+        }
+
+        function Header() {
+            return (
+                <header className="bg-green-700 text-white shadow-lg">
+                    <div className="container mx-auto px-4 py-6">
+                        <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-3">
+                                <i className="fas fa-leaf text-2xl"></i>
+                                <h1 className="text-2xl font-bold">Cacao Disease Detection</h1>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+            );
+        }
+
+        function ImageUpload({ onImageSelect }) {
+            const [preview, setPreview] = React.useState(null);
+            const [dragActive, setDragActive] = React.useState(false);
+
+            const handleDrag = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setDragActive(e.type === "dragenter" || e.type === "dragover");
+            };
+
+            const handleDrop = (e) => {
+                e.preventDefault();
+                setDragActive(false);
+                const file = e.dataTransfer.files[0];
+                processFile(file);
+            };
+
+            const handleFileSelect = (e) => {
+                const file = e.target.files[0];
+                processFile(file);
+            };
+
+            const processFile = (file) => {
+                if (file?.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setPreview(reader.result);
+                        onImageSelect(file);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            return (
+                <div className="max-w-2xl mx-auto mt-8 p-4">
+                    <div className={`upload-area p-8 rounded-lg text-center border-2 border-dashed ${dragActive ? 'border-green-500 bg-green-50' : 'border-gray-300'}`}
+                        onDragEnter={handleDrag}
+                        onDragLeave={handleDrag}
+                        onDragOver={handleDrag}
+                        onDrop={handleDrop}>
+                        {preview ? (
+                            <div>
+                                <img src={preview} alt="Preview" className="max-h-60 mx-auto mb-4 object-contain" />
+                                <button onClick={() => { setPreview(null); onImageSelect(null); }}
+                                    className="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                                    Change Image
+                                </button>
+                            </div>
+                        ) : (
+                            <div>
+                                <i className="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
+                                <p className="text-gray-600 mb-4">Drag and drop your cacao plant image here or</p>
+                                <label className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">
+                                    Browse Files
+                                    <input type="file" className="hidden" accept="image/*" onChange={handleFileSelect} />
+                                </label>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function AnalysisResult({ result, loading }) {
+            if (loading) {
+                return (
+                    <div className="max-w-2xl mx-auto mt-8 p-4 text-center">
+                        <i className="fas fa-spinner loading-spinner text-3xl text-green-600"></i>
+                        <p className="mt-4 text-gray-600">Analyzing image...</p>
+                    </div>
+                );
+            }
+
+            if (!result) return null;
+
+            return (
+                <div className="max-w-2xl mx-auto mt-8 p-6 bg-white rounded-lg shadow-lg">
+                    <h2 className="text-2xl font-bold mb-4">Analysis Result</h2>
+                    <div className="mb-6 flex items-center gap-3">
+                        <div className={`px-3 py-1 rounded-full text-sm ${result.prediction === 'Healthy' ? 
+                            'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {result.prediction}
+                        </div>
+                        {result.severity && (
+                            <div className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
+                                Severity: {result.severity}
+                            </div>
+                        )}
+                    </div>
+                    <div className="space-y-4 mb-6">
+                        <h3 className="font-semibold text-lg">Detection Details:</h3>
+                        {result.confidences.map((conf, index) => (
+                            <div key={index} className="relative">
+                                <div className="flex justify-between mb-1">
+                                    <span className="text-sm font-medium">
+                                        {conf.label} {conf.identified && '✅'}
+                                    </span>
+                                    <span>{(conf.score * 100).toFixed(1)}%</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                    <div className="confidence-bar bg-green-600 h-2.5 rounded-full" 
+                                        style={{ width: `${conf.score * 100}%` }} />
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {result.recommendations && (
+                        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                            <h3 className="text-lg font-semibold mb-2">Recommended Actions</h3>
+                            <ul className="list-disc pl-5 space-y-2">
+                                {result.recommendations.map((rec, i) => (
+                                    <li key={i} className="text-blue-700">{rec}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                    {result.references && (
+                        <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                            <h3 className="text-sm font-semibold mb-2">Supporting References</h3>
+                            <div className="text-xs space-y-1">
+                                {result.references.map((ref, i) => (
+                                    <p key={i} className="text-gray-600">• {ref}</p>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function AdminNotification({ result }) {
+            if (!result || result.prediction === 'Healthy') return null;
+
+            return (
+                <div className="max-w-2xl mx-auto mt-4 p-4 bg-red-50 border-l-4 border-red-400">
+                    <div className="flex items-center gap-3">
+                        <i className="fas fa-exclamation-triangle text-red-500"></i>
+                        <div>
+                            <h4 className="font-semibold">Admin Alert: Disease Detected</h4>
+                            <p className="text-sm text-gray-600">
+                                High-priority detection requires review. 
+                                <button className="ml-2 text-red-600 hover:underline">
+                                    View detailed report →
+                                </button>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function HistoryList({ history }) {
+            if (!history?.length) {
+                return (
+                    <div className="max-w-2xl mx-auto mt-8 p-4 text-center text-gray-500">
+                        <i className="fas fa-history text-3xl mb-2"></i>
+                        <p>No analysis history yet</p>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="max-w-2xl mx-auto mt-8">
+                    <h2 className="text-2xl font-bold mb-6 px-4">Analysis History</h2>
+                    <div className="space-y-4">
+                        {history.map((item, index) => (
+                            <div key={index} className="history-card bg-white rounded-lg shadow-md p-4">
+                                <div className="flex items-start space-x-4">
+                                    <div className="w-24 h-24 flex-shrink-0">
+                                        <img src={item.imageUrl} alt="Analysis" className="w-full h-full object-cover rounded" />
+                                    </div>
+                                    <div className="flex-grow">
+                                        <div className="flex items-center justify-between">
+                                            <span className={`px-2 py-1 rounded-full text-sm ${item.prediction === 'Healthy' ? 
+                                                'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                {item.prediction}
+                                            </span>
+                                            <span className="text-sm text-gray-500">
+                                                {new Date(item.timestamp).toLocaleString()}
+                                            </span>
+                                        </div>
+                                        {item.severity && (
+                                            <div className="mt-2 text-sm">
+                                                Severity: <span className="font-medium">{item.severity}</span>
+                                            </div>
+                                        )}
+                                        <div className="mt-2">
+                                            {item.confidences.slice(0, 2).map((conf, idx) => (
+                                                <div key={idx} className="text-sm">
+                                                    <div className="flex justify-between">
+                                                        <span>{conf.label}</span>
+                                                        <span>{(conf.score * 100).toFixed(1)}%</span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function analyzeImage(file) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    const diseases = {
+                        'Healthy': { severity: null, references: [] },
+                        'Black Pod Disease': {
+                            severity: 'High',
+                            recommendations: [
+                                'Remove and destroy infected pods',
+                                'Apply copper-based fungicides',
+                                'Improve drainage around plants'
+                            ],
+                            references: [
+                                'ICCO: Black Pod Management (2023)',
+                                'USDA Technical Bulletin #412'
+                            ]
+                        },
+                        'Pod Borer Infestation': {
+                            severity: 'Medium',
+                            recommendations: [
+                                'Apply biological controls (e.g., Trichogramma wasps)',
+                                'Use pheromone traps for monitoring',
+                                'Remove and burn affected pods'
+                            ],
+                            references: [
+                                'Cocoa Research Institute of Ghana (2022)',
+                                'IPM Guidelines for Cocoa'
+                            ]
+                        }
+                    };
+
+                    const detectedDisease = Math.random() > 0.5 ? 
+                        'Black Pod Disease' : 'Pod Borer Infestation';
+
+                    const response = {
+                        prediction: Math.random() > 0.6 ? detectedDisease : 'Healthy',
+                        confidences: [
+                            { label: 'Healthy', score: Math.random() * 0.3 },
+                            { label: 'Black Pod Disease', score: Math.random() },
+                            { label: 'Pod Borer Infestation', score: Math.random() },
+                            { label: 'Witches Broom', score: Math.random() * 0.5 }
+                        ].sort((a, b) => b.score - a.score),
+                        ...diseases[detectedDisease]
+                    };
+
+                    resolve(response);
+                }, 1500);
+            });
+        }
+
+        function saveToHistory(analysisResult, imageUrl) {
+            const historyItem = {
+                imageUrl,
+                prediction: analysisResult.prediction,
+                confidences: analysisResult.confidences,
+                severity: analysisResult.severity,
+                timestamp: new Date().toISOString()
+            };
+
+            const savedItems = JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+            savedItems.unshift(historyItem);
+            localStorage.setItem('analysisHistory', JSON.stringify(savedItems.slice(0, 10)));
+            return savedItems;
+        }
+
+        function loadHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('analysisHistory') || '[]');
+            } catch (error) {
+                console.error('Error loading history:', error);
+                return [];
+            }
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

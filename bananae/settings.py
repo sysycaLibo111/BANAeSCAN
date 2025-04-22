@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'escan',
-    # 'escanallauth',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -190,8 +189,12 @@ STATICFILES_DIRS = [
 
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+import os
 
-MEDIA_URL='/media/'
+# MEDIA Settings
+MEDIA_URL = 'https://crvtfxinuvycxwgihree.supabase.co/storage/v1/object/public/product-images/'
+
+# MEDIA_URL='/media/'
 MEDIA_ROOT= os.path.join(BASE_DIR,'media')
 
 # Default primary key field type

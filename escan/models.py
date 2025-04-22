@@ -16,6 +16,7 @@ class CustomUser(AbstractUser):
     last_name = models.CharField(max_length=50)  # Last name field
     username = models.CharField(max_length=50, unique=True)  # Unique username
     email = models.EmailField(unique=True)  # Unique email
+    image_url = models.ImageField(max_length=500, blank=True, null=True)  # Store image URL from Supabase
     password = models.CharField(max_length=255)  # Hashed password storage
     is_deleted = models.BooleanField(default=False)  # Soft delete field
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='User')
@@ -45,7 +46,6 @@ class PasswordReset(models.Model):
 
 
 
-
 # E-commerce related models
 
 class Category(models.Model):
@@ -61,14 +61,14 @@ class Category(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    address = models.TextField(blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
 
     class Meta:
         db_table = 'customer'
 
     def __str__(self):
-        return self.user.username
+        return self.user.first_name + " " + self.user.last_name
+
 
 class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
@@ -97,17 +97,72 @@ class Product(models.Model):
 
 
 class Order(models.Model):
-    product= models.ForeignKey(Product, on_delete=models.CASCADE)
-    customer= models.ForeignKey(Customer, on_delete=models.CASCADE)
-    quantity=models.IntegerField()
-    order_date= models.DateTimeField(auto_now_add=True)
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('On Process', 'On Process'),
+        ('Delivered', 'Delivered'),
+        ('Cancelled', 'Cancelled'),
+        ('Paid', 'Paid'),
+    ]
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    order_date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status=models.BooleanField(default=False)
-    
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    paid = models.BooleanField(default=False)
 
-    class Meta:
-        db_table = 'order'
+    def save(self, *args, **kwargs):
+        if self.status == "Delivered":
+            self.product.stock -= self.quantity
+            self.product.save()
+        super().save(*args, **kwargs)
+
+class Cart(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    completed = models.BooleanField(default=False)
+
+    @property
+    def get_cart_total(self):
+        cartitems = self.cartitems_set.all()
+        total = sum([item.get_total for item in cartitems])
+        return total
+
+    @property
+    def get_itemtotal(self):
+        cartitems = self.cartitems_set.all()
+        total = sum([item.quantity for item in cartitems])
+        return total
 
     def __str__(self):
-        return f"Order {self.id} by {self.customer.user.username}"
+        return f"Cart {self.id} for {self.customer.user.username}"
 
+class Cartitems(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product =  models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=0)
+
+
+    @property
+    def get_total(self):
+        total = self.quantity * self.product.price
+        if total == 0.00:
+            self.delete()
+        return total
+
+    
+
+    def __str__(self):
+        return self.product.name
+
+
+class ShippingAddress(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    address = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    zipcode = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.address

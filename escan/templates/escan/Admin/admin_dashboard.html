@@ -1,56 +1,714 @@
-{% extends 'base.html' %}
-
-{% block content %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/admin_dashboard.css' %}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <style>
+        /* General Body Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        /* Sidebar Styles */
+        nav.sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: 100vh;
+            background-color: #c1b22e;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        /* Logo Styles */
+        nav .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        nav .logo img {
+            height: 50px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+        
+        nav .logo span {
+            color: black;
+            font-size: 30px;
+            font-weight: bold;
+        }
+        
+        /* Logo Container */
+        .logo-container {
+            margin-left: 50px;
+            align-items: center;
+        }
+        
+        .logo {
+            width: 150px;
+            padding: 5px;
+            border-radius: 50%;
+            border: 2px solid rgb(231, 235, 231);
+            align-items: center;
+            height: auto;
+        }
+        
+        /* Burger Menu */
+        .burger {
+            display: none;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        .burger div {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 4px 0;
+        }
+        
+        /* Sidebar Menu */
+        nav .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+            margin-left: 20px;
+        }
+        
+        nav .menu a {
+            color: black;
+            text-decoration: none;
+            font-size: 28px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        nav .menu a:hover {
+            background-color: white;
+            border-top-left-radius: 20px;
+            border-bottom-left-radius: 20px;
+            width: 220px;
+            height: 50px;
+            color: green;
+        }
+        
+        /* Content Styling */
+        .content {
+            margin-left: 250px;
+            transition: margin-left 0.3s;
+        }
+        
+        /* Navigation Bar Styles */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        /* Search Box Styling */
+        .search-box {
+            justify-self: end;
+            font-size: 25px;
+            color: white;
+            margin-left: 9in;
+        }
+        
+        .search-box input[type="text"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #0a0606;
+        }
+        
+        .search-btn {
+            padding: 10px 10px;
+            font-size: 25px;
+            border-radius: 5px;
+            background-color: #333;
+        }
+        
+        /* Icons in Navigation */
+        .icons {
+            display: flex;
+            gap: 40px;
+            padding: 15px;
+            font-size: 30px;
+        }
+        
+        .message-icon,
+        .notification-icon,
+        .profile-icon,
+        .logout-icon {
+            cursor: pointer;
+        }
+        
+        .fas.fa-comments,
+        .fas.fa-bell,
+        .fas.fa-user,
+        .fas.fa-sign-out-alt {
+            font-size: 30px;
+        }
+        
+        /* Profile Dropdown Styling */
+        #profileDropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 20px;
+            z-index: 1000;
+            width: 300px;
+            font-size: 25px;
+        }
+        
+        #profileDropdown h2 {
+            font-size: 30px;
+            margin-bottom: 15px;
+            color: #28A745;
+        }
+        
+        #profileDropdown .form-group {
+            margin-bottom: 15px;
+            color: #4e7145;
+        }
+        
+        #profileDropdown .form-control {
+            font-size: 25px;
+            width: 100%;
+            padding: 6px 10px;
+        }
+        
+        #profileDropdown label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 25px;
+        }
+        
+        #profileDropdown .action-btn {
+            margin-top: 10px;
+            font-size: 20px;
+        }
+        
+        /* Card Styling */
+        .card {
+            border-radius: 8px;
+            text-align: center;
+            padding: 10px;
+            min-width: 400px;
+            background-color: white;
+        }
+        
+        .card-header {
+            font-weight: bold;
+            font-size: 25px;
+            color: black;
+        }
+        
+        .card-title {
+            font-size: 30px;
+            font-weight: bold;
+        }
+        
+        .card-text {
+            font-size: 20px;
+        }
+        
+        /* Card Container Styling */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 10px;
+            margin-top: 50px;
+            margin-left: 30px;
+        }
+        
+        /* Action Button Styling */
+        .action-btn {
+            padding: 10px 10px;
+            font-size: 25px;
+            border-radius: 5px;
+        }
+        
+        /* Popover Styling */
+        .popover {
+            border: 1px solid #eb9c25;
+            border-radius: 5px;
+            font-size: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .popover .popover-header {
+            background-color: #0d6efd;
+            color: white;
+            border-bottom: 1px solid #0d6efd;
+        }
+        
+        .popover .popover-body {
+            color: #333;
+        }
+        
+        /* Datetime Styling */
+        #datetime {
+            font-weight: bold;
+            font-size: 22px;
+            padding: 15px;
+            color: #8A2B13;
+        }
+        
+        /* Chart and Graph Styles */
+        #userJoinDateChart {
+            width: 800px;
+            height: 400px;
+        }
+        
+        .user_graph {
+            width: 900px;
+            height: 400px;
+        }
+        
+        .user_graph_content {
+            transition: margin-left 0.3s;
+        }
+        
+        .user_graph canvas {
+            max-height: 400px;
+            font-size: 30px;
+        }
+        
+        /* User Container */
+        .user-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 10px;
+            margin-top: 50px;
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            justify-content: space-between;
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .filter-group input,
+        .filter-group button {
+            width: 100%;
+        }
+        
+        .filter-date-btn {
+            background-color: #007BFF;
+            color: white;
+        }
+        
+        .filter-month-btn {
+            background-color: #28A745;
+            color: white;
+        }
+        
+        .filter-year-btn {
+            background-color: #FFC107;
+            color: black;
+        }
+        
+        .reset-btn {
+            background-color: #032f55;
+            color: white;
+            margin-bottom: 1rem;
+            width: 100px;
+        }
+        </style>
+        
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo-container">
+            <img src="{% static 'img/LogoW.png' %}" alt="Logo" class="logo">
+        </div>
+        <div class="menu">
+            <a href="{% url 'admin_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+            <a href="{% url 'product_list' %}"><i class="fas fa-box"></i>Products</a>
+            <a href="{% url 'orders_part' %}"><i class="fas fa-shopping-cart"></i> Orders</a>
+            <a href="#"><i class="fas fa-chart-line"></i> Sales</a>
+            <a href="{% url 'customer_table' %}"><i class="bi bi-people-fill"></i> Customers</a>
+            <a href="#"><i class="fas fa-file-alt"></i> Reports</a>
+        </div>
+        <div class="burger" id="burger" onclick="toggleNav()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </nav>
+    <div class="content">
+        <div class="nav-bar">
+            <P style=" font-weight: bold; font-size: 25px;padding: 15px;">DASHBOARD</P>
+            <p id="datetime"></p>
+            <div class="search-box" >
+                <input type="text" placeholder="Search...">
+                <button class="search-btn" style="color: white;">Search</button>
+            </div>
+            <div class="icons">
+                <div class="profile-icon" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#profileModal">
+                    <img src="{{ user.image_url }}" alt="Profile" class="profile-image" style="width: 50px; height: 50px; border-radius: 50%;">
+                </div>
+                
+                <!-- Modal for Profile Editing -->
+                <div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="profileModalLabel">Edit Profile</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <form method="POST" enctype="multipart/form-data" id="profileForm">
+                                {% csrf_token %}
+                                <div class="modal-body">
 
-<!-- Content -->
-<div class="content">
-    <h1 style="margin-left: 50px; margin-bottom: 50px; font-weight: bold;">ADMIN DASHBOARD</h1>
+                                    {% if messages %}
+                                   <div class="message-container">
+                                     {% for message in messages %} 
+                                       {% if message.tags == 'error' %}
+                                         <div class="error-message">
+                                           <p style="color: rgb(224, 78, 15); font-size: 15px;">{{ message }}</p>
+                                         </div>
+                                       {% else %}
+                                         <div class="info-message"></div>>
+                                           <p style="color: rgb(98, 219, 18); font-size: 15px;">{{ message }}</p>
+                                         </div>
+                                       {% endif %}
+                                     {% endfor %}
+                                   </div>
+                                   {% endif %}
+                                    <!-- Form Fields for Profile -->
+                                    <div class="form-group">
+                                        <label for="id_first_name">First Name</label>
+                                        <input type="text" name="first_name" id="id_first_name" class="form-control" value="{{ user.first_name }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_last_name">Last Name</label>
+                                        <input type="text" name="last_name" id="id_last_name" class="form-control" value="{{ user.last_name }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_username">Username</label>
+                                        <input type="text" name="username" id="id_username" class="form-control" value="{{ user.username }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_email">Email</label>
+                                        <input type="email" name="email" id="id_email" class="form-control" value="{{ user.email }}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_password">Password (Leave Blank to Keep Same)</label>
+                                        <input type="password" name="password" id="id_password" class="form-control" placeholder="New Password">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="id_image_url" class="form-label">Profile Picture</label>
+                                        <input type="file" name="image_url" id="id_image_url" class="form-control" accept="image/*">
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
 
-  <!-- Cards Section -->
-<div class="card-container">
-    <div class="card bg-primary text-white">
-        <div class="card-header">Bilang ng mga Gumagamit</div>
-        <div class="card-body">
-            <h5 class="card-title">{{ total_users }}</h5>
-            <p class="card-text">Mga rehistradong gumagamit sa system.</p>
-            <a href="{% url 'user_table' %}" style="color: yellow;">Mag Tungo sa User' Table</a>
+                <div class="message-icon" onclick="toggleMessages()" style="cursor: pointer;">
+                    <i class="fas fa-comments" style="color: #0a0318;"></i>
+                </div>
+                <div class="notification-icon" onclick="toggleNotifications()" style="cursor: pointer;">
+                    <i class="fas fa-bell" style="color: #0a0318;"></i>
+                    
+                </div>
+
+                <div class="logout-icon" onclick="toggleLogout()" style="cursor: pointer;">
+                  <a href="{% url 'logout' %}" style="color: #8A2B13;"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="card" style="box-shadow: 0 4px 8px rgba(3, 60, 215, 0.883);">
+                <div class="card-header">Bilang ng mga Gumagamit</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_users }}</h5>
+                    <p class="card-text">Mga rehistradong gumagamit sa system.</p>
+                    <a href="{% url 'user_table' %}" class="action-btn" style="margin-left: 20px; background-color: #4e7145; color: white;text-decoration: none;" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Magtungo sa Listahan ng mga Users">
+                        <i class="fas fa-arrow-right"></i> Go To User' Table
+                    </a>
+                </div>
+            </div>
+            <div class="card" style="box-shadow: 0 4px 8px rgba(215, 102, 3, 0.883);">
+                <div class="card-header">Total Orders</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_orders }}</h5>
+                    <p class="card-text">Orders processed successfully.</p>
+                </div>
+            </div>
+            <div class="card" style="box-shadow: 0 4px 8px rgba(105, 215, 3, 0.883);">
+                <div class="card-header">Total Customers</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_customer }}</h5>
+                    <p class="card-text">List of customers.</p>
+                    <a href="{% url 'customer_table' %}" class="action-btn" style="margin-left: 20px; background-color: #4e7145; color: white;text-decoration: none;" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Magtungo sa Listahan ng mga Customers">
+                        <i class="fas fa-arrow-right"></i> Go to Customer Table
+                    </a>
+                </div>
+            </div>
+            <div class="card" style="box-shadow: 0 4px 8px rgba(201, 215, 3, 0.883);">
+                <div class="card-header">Total Sales</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_Sales }}</h5>
+                    <p class="card-text">Total Sales</p>
+                </div>
+            </div>
+            <div class="card" style="box-shadow: 0 4px 8px rgba(130, 3, 215, 0.883);">
+                <div class="card-header">Scan's Report</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_reports }}</h5>
+                    <p class="card-text">Scanned reports generated.</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="card bg-success">
-        <div class="card-header">Total Orders</div>
-        <div class="card-body">
-            <h5 class="card-title">{{ total_orders }}</h5>
-            <p class="card-text">Orders processed successfully.</p>
+     <div class="user_graph_content">
+        <div class="container user-container">
+            <div class="card user-card" style="box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+                <h3>User Join Dates</h3>
+                <button class="btn reset-btn" id="resetFilter">Reset</button>
+                <div class="user_graph">
+                    <canvas id="userJoinDateChart"></canvas>
+                </div>
+    
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label for="calendarDate">Filter by Date:</label>
+                        <input type="date" id="calendarDate">
+                        <button class="btn filter-date-btn" id="filterByDate">Date</button>
+                    </div>
+                    <div class="filter-group">
+                        <label for="monthPicker">Filter by Month:</label>
+                        <input type="month" id="monthPicker">
+                        <button class="btn filter-month-btn" id="filterMonth">Month</button>
+                    </div>
+                    <div class="filter-group">
+                        <label for="yearPicker">Filter by Year:</label>
+                        <input type="number" id="yearPicker" min="2000" max="2099" placeholder="Enter Year">
+                        <button class="btn filter-year-btn" id="filterYear">Year</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+    
+    <script>
+        // Function to update the datetime every second
+        function updateTime() {
+            const now = new Date();
+            const formattedTime = now.toLocaleString(); // You can customize the format as needed
+            document.getElementById("datetime").textContent = `(Date Time: ${formattedTime})`;
+        }
+        setInterval(updateTime, 1000);
 
-    <div class="card bg-warning">
-        <div class="card-header">Total Order Pending</div>
-        <div class="card-body">
-            <h5 class="card-title">{{ total_order_pending }}</h5>
-            <p class="card-text">Sales made in the store.</p>
-        </div>
-    </div>
 
-    <div class="card bg-danger ">
-        <div class="card-header">Total Sales</div>
-        <div class="card-body">
-            <h5 class="card-title">{{ total_Sales }}</h5>
-            <p class="card-text">Scanned reports generated.</p>
-        </div>
-    </div>
-    <div class="card bg-info ">
-        <div class="card-header">Scan's Report </div>
-        <div class="card-body">
-            <h5 class="card-title">{{ total_reports }}</h5>
-            <p class="card-text">Scanned reports generated.</p>
-        </div>
-    </div>
-</div>
+        document.addEventListener("DOMContentLoaded", function () {
+        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+        var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+            return new bootstrap.Popover(popoverTriggerEl);
+            });
+         });
+        function toggleNav() {
+        const sidebar = document.querySelector('nav.sidebar');
+        const content = document.querySelector('.content');
 
-</div>
-{% endblock %}
+        if (sidebar.style.display === 'none' || sidebar.style.display === '') {
+            sidebar.style.display = 'flex'; 
+            content.style.marginLeft = '250 px'; 
+        } else {
+            sidebar.style.display = 'none'; 
+            content.style.marginLeft = '0'; 
+             }
+        }
+        function toggleMessages() {
+            // Logic to show/hide messages dropdown
+        }
+
+        function toggleNotifications() {
+            // Logic to show/hide notifications dropdown
+        }
+       
+
+        document.getElementById("profileForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            var formData = new FormData(this);
+
+            fetch("{% url 'update_profile' %}", {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Profile updated successfully!");
+                        location.reload(); // Reload the page to reflect changes
+                    } else {
+                        alert("Error updating profile: " + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const rawData = JSON.parse(document.getElementById('user-data').textContent);
+            const allDates = rawData.map(user => new Date(user.date_joined));
+        
+            const customColors = ['#4E7145', '#1B9C35', '#C4501B', '#8A2B13', '#f5bb5b', '#ed872d', '#9c9251', '#daaE55'];
+        
+            function groupByDay(datesArray) {
+                const grouped = {};
+                datesArray.forEach(date => {
+                    const key = date.toLocaleDateString();
+                    grouped[key] = (grouped[key] || 0) + 1;
+                });
+                return grouped;
+            }
+        const ctx = document.getElementById('userJoinDateChart').getContext('2d');
+        let chart;
+
+        function renderChart(groupedData) {
+            const labels = Object.keys(groupedData);
+            const data = Object.values(groupedData);
+            const backgroundColors = labels.map((_, index) => customColors[index % customColors.length]);
+
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Users Joined',
+                        data: data,
+                        borderColor: 'black',
+                        backgroundColor: backgroundColors,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Users'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date Joined'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChartWithFilter(filterFn) {
+            const filtered = allDates.filter(filterFn);
+            const grouped = groupByDay(filtered);
+            renderChart(grouped);
+        }
+
+        // Initial load
+        updateChartWithFilter(() => true);
+
+        document.getElementById('filterByDate').addEventListener('click', () => {
+            const selected = document.getElementById('calendarDate').value;
+            if (!selected) return;
+            const targetDate = new Date(selected).toDateString();
+            updateChartWithFilter(date => date.toDateString() === targetDate);
+        });
+
+        document.getElementById('filterMonth').addEventListener('click', () => {
+            const selectedMonth = document.getElementById('monthPicker').value;
+            if (!selectedMonth) return;
+            const [year, month] = selectedMonth.split('-');
+            updateChartWithFilter(date =>
+                date.getFullYear() == year && (date.getMonth() + 1) == parseInt(month)
+            );
+        });
+
+        document.getElementById('filterYear').addEventListener('click', () => {
+            const selectedYear = parseInt(document.getElementById('yearPicker').value);
+            if (!selectedYear) return;
+            updateChartWithFilter(date => date.getFullYear() == selectedYear);
+        });
+
+        document.getElementById('resetFilter').addEventListener('click', () => {
+            updateChartWithFilter(() => true);
+         });
+        });
+</script>
+
+<script type="application/json" id="user-data">
+    [
+        {% for user in users %}
+            {
+                "first_name": "{{ user.first_name }}",
+                "date_joined": "{{ user.date_joined|date:'Y-m-d' }}"
+            }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ]
+</script>
+
+    
+</body>
+</html>

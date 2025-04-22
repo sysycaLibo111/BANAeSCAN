@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% load static %}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - BANAeScan</title>
+</head>
+<style>
+  body {
+      margin: 0;
+      padding: 0;
+      font-family: Georgia, Times, 'Times New Roman', serif;
+      background-color: #fff8dc;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+
+  .card {
+      background: url("{% static 'img/bc1.png' %}") no-repeat center/cover;
+      width: 600px;
+      height: 700px;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(215, 102, 3, 0.883);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .close-button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 10px;
+      color: black;
+      border-color: #000000;
+      background-color: rgba(215, 102, 3, 0);
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s;
+  }
+
+  .form-container {
+      width: 80%;
+      height: 100%;
+      background-color: rgba(17, 62, 4, 0.75);
+      padding: 40px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .form-title {
+      font-size: 24px;
+      font-weight: bold;
+      color: #d4a017;
+      margin-bottom: 20px;
+  }
+
+  .input-group {
+      width: 100%;
+      margin-bottom: 30px;
+      
+  }
+
+  .input-group input {
+      width: 400px;
+      font-size: 20px;
+      height: 60px;
+      padding: 10px;
+      border: 1.2px solid #aaa;
+      border-radius: 5px;
+      outline: none;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+  }
+
+  .btn {
+      width: 100%;
+      height: 45px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      background-color: #d4a017;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 50px;
+  }
+
+  .btn:hover {
+      background-color: #b8860b;
+  }
+
+  /* Centering separator */
+  .separator {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 20px 0;
+      width: 100%;
+  }
+
+  .separator .line {
+      flex: 1;
+      height: 1px;
+      background-color: #ccc;
+      border: none;
+  }
+
+  .separator span {
+      margin: 0 10px;
+      color: #fff;
+  }
+
+  .forgot-password {
+      text-align: center;
+      margin: 10px 0;
+      color: white;
+      margin-bottom: 30px;
+  }
+  .input-group select {
+    width: 200px;
+    font-size: 18px;
+    height: 50px;
+    padding: 10px;
+    border: 1.2px solid #aaa;
+    border-radius: 5px;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background-color: white;
+    color: #333;
+    appearance: none; /* Removes default dropdown arrow for full control */
+}
+
+
+</style>
+
+<body>
+  <div class="card">
+    
+    <div class="form-container">
+      <button class="close-button" onclick="window.location.href='{% url 'landing_page' %}'">X</button>
+      <h1 class="form-title">LOGIN</h1>
+      <button class="close-button" onclick="translateToTagalog()" style="top: 50px; right: 50px; background-color: #e4b337;font-family: 'Times New Roman', Times, serif;">PH</button>
+      {% if messages %}
+        <div class="message-container">
+          {% for message in messages %} 
+            {% if message.tags == 'error' %}
+              <div class="error-message">
+                <h4 style="color: rgb(224, 78, 15);">{{ message }}</h4>
+              </div>
+            {% else %}
+              <div class="info-message">
+                <h4 style="color: rgb(98, 219, 18);">{{ message }}</h4>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      <form method="POST">
+        {% csrf_token %}
+        <div class="input-group">
+          <input type="text" name="username" placeholder="Username" required>
+        </div>
+        <div class="input-group">
+          <input type="password" name="password" placeholder="Password" required>
+        </div>
+        <div class="input-group">
+          <div style="position: relative;">
+            <select name="role" required>
+              <option value="" disabled selected>Select Role</option>
+              <option value="User">User</option>
+              <option value="Admin">Admin</option>
+            </select>
+            <!-- <span style="position: absolute; right: 15px; top: 20px; pointer-events: none;">▼</span> -->
+          </div>
+        </div>
+        
+        <a class="forgot-password" href="{% url 'forgot-password' %}">Forgot Password?</a>
+        
+      
+
+        <button type="submit" class="btn">login</button>
+      </form>
+      <p id="signup-text" data-signup-url="{% url 'signup_view' %}" style="font-size: 16px; color: white;">
+        Do you have an account? 
+        <a href="{% url 'signup_view' %}" style="font-size: 16px; color: #d4a017;">Sign Up Now</a>
+      </p>      
+      <div class="separator">
+        <hr class="line">
+        <span>OR</span>
+        <hr class="line">
+      </div>
+    </div>
+  </div>
+  <script>
+    function translateToTagalog() {
+      document.querySelector('.form-title').innerText = 'MAG-LOGIN';
+      document.querySelector('input[name="username"]').placeholder = 'Pangalan ng Gumagamit';
+      document.querySelector('input[name="password"]').placeholder = 'Password';
+      document.querySelector('select[name="role"] option[value=""]').textContent = 'Pumili ng Papel';
+      document.querySelector('.forgot-password').innerText = 'Nakalimutan ang Password?';
+      document.querySelector('.btn').innerText = 'Mag-login';
+      const signupURL = document.getElementById('signup-text').getAttribute('data-signup-url');
+      document.querySelector('#signup-text').innerHTML = 'May account ka na ba? <a href="' + signupURL + '" style="font-size: 16px; color: #d4a017;">Mag-sign up ngayon</a>';
+  
+      document.querySelector('.separator span').innerText = 'O';
+    }
+  </script>
+  
+</body>
+</html>
