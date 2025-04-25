@@ -139,21 +139,23 @@ class Cart(models.Model):
 
 class Cartitems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
-    product =  models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    def save(self, *args, **kwargs):
+        self.total_price = self.quantity * self.product.price
+        if self.total_price == 0.00:
+            self.delete()
+        else:
+            super().save(*args, **kwargs)
 
     @property
     def get_total(self):
-        total = self.quantity * self.product.price
-        if total == 0.00:
-            self.delete()
-        return total
-
-    
+        return self.quantity * self.product.price
 
     def __str__(self):
-        return self.product.name
+        return f"{self.product.name} (x{self.quantity})"
 
 
 class ShippingAddress(models.Model):

@@ -281,7 +281,8 @@ margin-left: 50px;
 .cont_ainer {
     margin: auto;
     color: black;
-    margin-top: 20px;
+    height: 500px;
+    margin-top: 30px;
     padding: 20px; /* Add padding for better spacing */
 }
 
@@ -301,6 +302,9 @@ margin-left: 50px;
             <a href="#"><i class="fas fa-truck"></i> To Ship</a>
             <a href="#"><i class="fas fa-money-bill-wave"></i> Transactions</a>
             <a href="{% url 'scan' %}"><i class="fas fa-qrcode"></i> Scan Now</a>
+            <a href="{% url 'scan' %}"><i class="fas fa-book-open"></i> Library</a>
+            <a hrhref="{% url 'scan' %}"><i class="fas fa-users"></i> Team</a>
+
         </div>
         <div class="burger" id="burger" onclick="toggleNav()">
             <div></div>
@@ -317,13 +321,14 @@ margin-left: 50px;
                 <button class="action-btn" style="color: white;">Search</button>
             </div>
             <form class="d-flex">
-                <a href = "{% url 'cart' %}">
-                  <div class ='cart_container'>
-                    <i class="fas fa-shopping-cart" style="font-size: 30px; color: black;margin-top: 10px;"></i>
-                  <div class = 'cart-item-count'><h4>{{cart.get_itemtotal}}</h4></div>
-              </div>
-            </a> 
-              </form>
+                <a href="{% url 'cart' %}">
+                    <div class='cart_container'>
+                        <i class="fas fa-shopping-cart" style="font-size: 30px; color: black;margin-top: 10px;"></i>
+                        <div class='cart-item-count'><h4>{{ cart.get_itemtotal }}</h4></div>
+                    </div>
+                    
+                </a>
+            </form>
             <div class="icons">
                 <div class="message-icon" onclick="toggleMessages()" style="cursor: pointer;">
                     <i class="fas fa-comments" style="color: #0a0318;"></i>
@@ -402,45 +407,22 @@ margin-left: 50px;
                 </div>
             </div>
         </div>
-        <div class="card-container">
-            <div class="card" style="box-shadow: 0 4px 8px rgba(3, 60, 215, 0.883);">
-                <div class="card-header">Orders</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ total_orders }}</h5>
-                    <p class="card-text">Mga orders.</p>
-                    <a href="" class="action-btn" style="margin-left: 20px; background-color: green; color: white;text-decoration: none;" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Magtungo sa Listahan ng iyong Orders">
-                        <i class="fas fa-arrow-right"></i> Go To Orders
-                    </a>
-                </div>
-            </div>
-            <div class="card" style="box-shadow: 0 4px 8px rgba(201, 215, 3, 0.883);">
-                <div class="card-header">History</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ total_Sales }}</h5>
-                    <p class="card-text">\</p>
-                </div>
-            </div>
-            <div class="card" style="box-shadow: 0 4px 8px rgba(130, 3, 215, 0.883);">
-                <div class="card-header">Scan's Report</div>
-                <div class="card-body">
-                    <h5 class="card-title">{{ total_reports }}</h5>
-                    <p class="card-text">Scanned reports generated.</p>
-                </div>
-            </div>
-        </div>
-
-
-        <div class='cont_ainer'>
+        <div class='cont_ainer' style="margin-left: 50px;">
             <div class='row'>
                 {% for product in products %}
                     <div class='col-md-4 col-lg-4'>
-                        <div class="card" style="width: 100%; background-color: #c1b22e;">
-                            <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                        <div class="card" style="width: 90%; background-color: rgb(39, 138, 10); height: 90%; ">
+                            <img style="height: 70%;" src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
                             <div class="card-body">
                                 <h3 class="card-title">{{ product.name }}</h3>
-                                <p>{{ product.description }}</p>
-                                <h4 class="card-text">${{ product.price }}</h4>
-                                <a class="btn btn-primary addtocart" data-action="add" data-product="{{ product.id }}">Add to Cart</a>
+                                <p style="text-align: justify;">{{ product.description }}</p>
+                                <div class="d-flex align-items-center gap-2">
+                                    <h4 class="card-text mb-0">Price ₱{{ product.price }}</h4>
+                                    <input type="number" class="quantity-input" data-price="{{ product.price }}" value="1" min="1" style="width: 60px;">
+                                    <p class="mb-0">Total: ₱ <span class="total-price">{{ product.price }}</span></p>
+                                    <a class="btn  addtocart" style="background-color: #c1b22e;" data-action="add" data-product="{{ product.id }}">Add to Cart</a>
+                                  </div>
+                                  
                             </div>
                         </div>
                     </div>
@@ -452,40 +434,11 @@ margin-left: 50px;
     </div>
 
 
+
+
     
     <script>
-            let btns = document.getElementsByClassName('addtocart')
-    for(let i = 0; i < btns.length; i++){
-        btns[i].addEventListener('click', function(){
-            let productId = this.dataset.product
-            let action = this.dataset.action
-            
-            if (user === "AnonymousUser"){
-                console.log("User is not logged in")
-            } else {
-                updateCart(productId, action)
-            }
-        })
-    }
-
-    function updateCart(productId, action){
-        fetch('/update_item/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
-            body: JSON.stringify({'productId': productId, 'action': action})
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data)
-            location.reload()
-        })
-    }
-
-
-        // Function to update the datetime every second
+    // Function to update the datetime every second
         function updateTime() {
             const now = new Date();
             const formattedTime = now.toLocaleString(); // You can customize the format as needed

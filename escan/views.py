@@ -119,8 +119,9 @@ def update_profile(request):
 # User Base of Side 
 def user_base(request):
     return render(request, "user_base.html")
+
 def scan(request):
-    return render(request, "escan/User/scan.html")
+    return render(request, "escan/User/Scan/scan.html")
 
 def admin_signup(request):
     if request.method == "POST":
@@ -775,12 +776,6 @@ def user_graph_view(request):
     return render(request, 'escan/Admin/E-commerce/product_list.html', {'users': user_data}) 
 
 
-
-@login_required
-def user_dashboard(request):
-    return render(request, "escan/User/user_dashboard.html")
-
-
 def signup_view(request):
     if request.method == "POST":
         form = UserProfileForm(request.POST, request.FILES)  # Use the form to handle POST data
@@ -856,15 +851,14 @@ def user_product_list(request):
         'categories': categories
     })
 
+
 @login_required
-def store(request):
+def user_dashboard(request):
     customer, created = Customer.objects.get_or_create(user=request.user)
     cart, created = Cart.objects.get_or_create(customer=customer, completed=False)
     products = Product.objects.filter(is_deleted=False) 
     return render(request, 'escan/User/user_dashboard.html', {'products': products,'cart': cart})
 
-def checkout(request):
-    return render(request, 'escan/User/E-commerceUser/checkout.html', {})
 @login_required
 def update_item(request):
     data = json.loads(request.body)
@@ -879,20 +873,10 @@ def update_item(request):
     if action == 'add':
         cart_item.quantity += 1
         cart_item.save()
-
-    return JsonResponse('Item added', safe=False)
-
-@login_required
-def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    customer = Customer.objects.get(user=request.user)
-
-    cart_item, created = Cart.objects.get_or_create(customer=customer, product=product)
-    if not created:
-        cart_item.quantity += 1  # Increase quantity if item already in cart
-    cart_item.save()  # This will also update total_price
-
-    return JsonResponse({'success': True, 'message': f'{product.name} added to cart!'})
+    
+    # Return the updated cart item count
+    cart_item_count = cart.get_itemtotal()  # Use the method to get the total count
+    return JsonResponse({'cartItemCount': cart_item_count}, safe=False)
 
 def cart(request):
     if request.user.is_authenticated:
@@ -941,7 +925,7 @@ def checkout(request):
 
 # Scan
 def detect(request):
-    return render(request, "escan/User/Detect.html")
+    return render(request, "escan/User/Scan/Detect.html")
 # @login_required
 # def order_summary(request):
 #     customer = Customer.objects.get(user=request.user)

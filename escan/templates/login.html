@@ -150,7 +150,12 @@
     <div class="form-container">
       <button class="close-button" onclick="window.location.href='{% url 'landing_page' %}'">X</button>
       <h1 class="form-title">LOGIN</h1>
-      <button class="close-button" onclick="translateToTagalog()" style="top: 50px; right: 50px; background-color: #e4b337;font-family: 'Times New Roman', Times, serif;">PH</button>
+      <select id="languageSelect" onchange="changeLanguage()" style="position: absolute; top: 50px; left: 20px; height: 20px; font-size: 14px; margin-left: 25px;">
+        <option value="en">English</option>
+        <option value="ph">Tagalog</option>
+      </select>
+      
+      <!-- <button class="close-button" onclick="translateToTagalog()" style="top: 50px; right: 50px; background-color: #e4b337;font-family: 'Times New Roman', Times, serif;">PH</button> -->
       {% if messages %}
         <div class="message-container">
           {% for message in messages %} 
@@ -203,18 +208,31 @@
     </div>
   </div>
   <script>
-    function translateToTagalog() {
-      document.querySelector('.form-title').innerText = 'MAG-LOGIN';
-      document.querySelector('input[name="username"]').placeholder = 'Pangalan ng Gumagamit';
-      document.querySelector('input[name="password"]').placeholder = 'Password';
-      document.querySelector('select[name="role"] option[value=""]').textContent = 'Pumili ng Papel';
-      document.querySelector('.forgot-password').innerText = 'Nakalimutan ang Password?';
-      document.querySelector('.btn').innerText = 'Mag-login';
-      const signupURL = document.getElementById('signup-text').getAttribute('data-signup-url');
-      document.querySelector('#signup-text').innerHTML = 'May account ka na ba? <a href="' + signupURL + '" style="font-size: 16px; color: #d4a017;">Mag-sign up ngayon</a>';
-  
-      document.querySelector('.separator span').innerText = 'O';
-    }
+    function changeLanguage() {
+  const lang = document.getElementById('languageSelect').value;
+  if (lang === 'ph') {
+    document.querySelector('.form-title').innerText = 'MAG-LOGIN';
+    document.querySelector('input[name="username"]').placeholder = 'Pangalan ng Gumagamit';
+    document.querySelector('input[name="password"]').placeholder = 'Password';
+    document.querySelector('select[name="role"] option[value=""]').textContent = 'Pumili ng Papel';
+    document.querySelector('.forgot-password').innerText = 'Nakalimutan ang Password?';
+    document.querySelector('.btn').innerText = 'Mag-login';
+    const signupURL = document.getElementById('signup-text').getAttribute('data-signup-url');
+    document.querySelector('#signup-text').innerHTML = 'May account ka na ba? <a href="' + signupURL + '" style="font-size: 16px; color: #d4a017;">Mag-sign up ngayon</a>';
+    document.querySelector('.separator span').innerText = 'O';
+  } else {
+    document.querySelector('.form-title').innerText = 'LOGIN';
+    document.querySelector('input[name="username"]').placeholder = 'Username';
+    document.querySelector('input[name="password"]').placeholder = 'Password';
+    document.querySelector('select[name="role"] option[value=""]').textContent = 'Select Role';
+    document.querySelector('.forgot-password').innerText = 'Forgot Password?';
+    document.querySelector('.btn').innerText = 'Login';
+    const signupURL = document.getElementById('signup-text').getAttribute('data-signup-url');
+    document.querySelector('#signup-text').innerHTML = 'Do you have an account? <a href="' + signupURL + '" style="font-size: 16px; color: #d4a017;">Sign Up Now</a>';
+    document.querySelector('.separator span').innerText = 'OR';
+  }
+}
+
   </script>
   
 </body>
