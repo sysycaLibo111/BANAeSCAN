@@ -143,7 +143,7 @@ margin-left: 50px;
     justify-self: end;
     font-size: 25px;
     color: white;
-    margin-left: 14in;
+    margin-left: 13.5in;
 
     
 }
@@ -160,16 +160,48 @@ margin-left: 50px;
     font-size: 30px;
 }
 
-.order-table {
-    width: 80%;
+.new-table {
+    width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
-    margin-left: 250px;
+    font-size: 25px;
+}
+
+.new-table thead {
+    background-color: #0a0909;
+    color: white;
+}
+
+.new-table th {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+.new-table tbody tr {
+    background-color: #fff;
+    border-bottom: 1px solid #ddd;
+}
+
+.new-table td {
+    padding: 10px;
+    text-align: left;
+}
+
+.new-table td:last-child {
+    text-align: center;
+}
+/* Total Orders */
+.order-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-size: 25px;
 }
 
 .order-table thead {
-    background-color: #0a0909;
-    color: white;
+    background-color:#eb9c25;
+    color: rgb(12, 12, 12);
 }
 
 .order-table th {
@@ -280,7 +312,7 @@ margin-left: 50px;
                 <input type="text" placeholder="Search...">
                 <button class="action-btn" style="color: white;">Search</button>
             </div>
-            <button class="btn" onclick="print()" style="background-color: #4e7145; color: white;" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="I-print ang kasalukuyang Ang kabuuan ng order">
+            <button class="btn" onclick="print()" style="background-color: #4e7145; color: white; font-size: 25px;" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="I-print ang kasalukuyang Ang kabuuan ng order">
                 <i class="fas fa-file-word"></i> Print
             </button>
             <div class="icons">
@@ -289,104 +321,110 @@ margin-left: 50px;
                 </div>
             </div>
         </div>
-
-        <div>
-            <p class="new-order-title">NEW ORDER</p>
-            <table class="order-table">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Product</th>
-                        <th>Customer</th>
-                        <th>Quantity</th>
-                        <th>Order Date</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                        <tr>
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.product.name }}</td>
-                            <td>{{ order.customer.name }}</td>
-                            <td>{{ order.quantity }}</td>
-                            <td>{{ order.order_date|date:"F d, Y H:i" }}</td>
-                            <td>₱{{ order.total_amount }}</td>
-                            <td>
-                                {% if order.status == 'completed' %}
-                                    <span class="status-completed">Completed</span>
-                                {% elif order.status == 'pending' %}
-                                    <span class="status-pending">Pending</span>
-                                {% elif order.status == 'processing' %}
-                                    <span class="status-processing">Processing</span>
-                                {% elif order.status == 'cancelled' %}
-                                    <span class="status-cancelled">Cancelled</span>
-                                {% elif order.status == 'delivered' %}
-                                    <span class="status-delivered">Delivered</span>
-                                {% else %}
-                                    <span class="status-unknown">Unknown</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <button class="btn btn-primary">View Details</button>
-                                <button class="btn btn-danger">Cancel Order</button>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        <div>
-            <p class="total-order-title">TOTAL ORDERS</p>
-            <table class="total_order-table">
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Product</th>
-                        <th>Customer</th>
-                        <th>Quantity</th>
-                        <th>Order Date</th>
-                        <th>Total Amount</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for order in orders %}
-                        <tr>
-                            <td>{{ order.id }}</td>
-                            <td>{{ order.product.name }}</td>
-                            <td>{{ order.customer.name }}</td>
-                            <td>{{ order.quantity }}</td>
-                            <td>{{ order.order_date|date:"F d, Y H:i" }}</td>
-                            <td>₱{{ order.total_amount }}</td>
-                            <td>
-                                {% if order.status == 'completed' %}
-                                    <span class="status-completed">Completed</span>
-                                {% elif order.status == 'pending' %}
-                                    <span class="status-pending">Pending</span>
-                                {% elif order.status == 'processing' %}
-                                    <span class="status-processing">Processing</span>
-                                {% elif order.status == 'cancelled' %}
-                                    <span class="status-cancelled">Cancelled</span>
-                                {% elif order.status == 'delivered' %}
-                                    <span class="status-delivered">Delivered</span>
-                                {% else %}
-                                    <span class="status-unknown">Unknown</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                <button class="btn btn-primary">View Details</button>
-                                <button class="btn btn-danger">Cancel Order</button>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+        <div style="margin-top: 100px;">
+        <h3 style="font-weight: bold;margin-left: 30px;">NEW ORDERS</h3>
+        <table class="new-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Order Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Change Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in new_orders %}
+                <tr>
+                    <td>
+                        <img src="{{ order.customer.user.image_url }}" alt="Customer Image" width="50" height="50">
+                        {{ order.customer.user.first_name }} {{ order.customer.user.last_name }}
+                      </td>
+                    <td>{{ order.product.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.order_date|date:"F d, Y H:i" }}</td>
+                    <td>₱{{ order.total_amount }}</td>
+                    <td><span class="status-pending">Pending</span></td>
+                    <td>
+                        <form method="POST" action="{% url 'update_order_status' order.id %}">
+                            {% csrf_token %}
+                            <select name="status" onchange="this.form.submit()">
+                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="completed">Completed</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8">No new orders</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <br><br>
+        
+        <h3 style="font-weight: bold; margin-left: 30px;">TOTAL ORDERS</h3>
+        <table class="order-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Order Date</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th>Change Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in total_orders %}
+                <tr>
+                    <td>
+                        <img src="{{ order.customer.user.image_url }}" alt="Customer Image" width="50" height="50">
+                        {{ order.customer.user.first_name }} {{ order.customer.user.last_name }}
+                      </td>
+                    <td>{{ order.product.name }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>{{ order.order_date|date:"F d, Y H:i" }}</td>
+                    <td>₱{{ order.total_amount }}</td>
+                    <td>
+                        <span class="
+                            {% if order.status == 'completed' %}status-completed
+                            {% elif order.status == 'processing' %}status-processing
+                            {% elif order.status == 'cancelled' %}status-cancelled
+                            {% elif order.status == 'delivered' %}status-delivered
+                            {% else %}status-unknown
+                            {% endif %}
+                        ">
+                            {{ order.status|capfirst }}
+                        </span>
+                    </td>
+                    <td>
+                        <form method="POST" action="{% url 'update_order_status' order.id %}">
+                            {% csrf_token %}
+                            <select name="status" onchange="this.form.submit()">
+                                <option value="pending" {% if order.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="processing" {% if order.status == 'on Process' %}selected{% endif %}>On Process</option>
+                                <option value="delivered" {% if order.status == 'delivered' %}selected{% endif %}>Delivered</option>
+                                <option value="completed" {% if order.status == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="cancelled" {% if order.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                            </select>
+                        </form>
+                        
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8">No orders found</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+        
     </div>
     
     

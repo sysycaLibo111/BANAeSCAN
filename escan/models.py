@@ -61,8 +61,7 @@ class Category(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=15, blank=True, null=True)
-
+    
     class Meta:
         db_table = 'customer'
 
@@ -96,28 +95,6 @@ class Product(models.Model):
         return self.name
 
 
-class Order(models.Model):
-    STATUS_CHOICES = [
-        ('Pending', 'Pending'),
-        ('On Process', 'On Process'),
-        ('Delivered', 'Delivered'),
-        ('Cancelled', 'Cancelled'),
-        ('Paid', 'Paid'),
-    ]
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
-    quantity = models.IntegerField()
-    order_date = models.DateTimeField(auto_now_add=True)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
-    paid = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        if self.status == "Delivered":
-            self.product.stock -= self.quantity
-            self.product.save()
-        super().save(*args, **kwargs)
-
 class Cart(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     completed = models.BooleanField(default=False)
@@ -141,12 +118,14 @@ class Cartitems(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=0)
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
         self.total_price = self.quantity * self.product.price
+        # Don't save the object if the total price is 0.00
         if self.total_price == 0.00:
-            self.delete()
+            # Optionally, you can add some other logic here if needed
+            return
         else:
             super().save(*args, **kwargs)
 
@@ -157,14 +136,37 @@ class Cartitems(models.Model):
     def __str__(self):
         return f"{self.product.name} (x{self.quantity})"
 
-
 class ShippingAddress(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15)
     address = models.CharField(max_length=100)
     city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
+    province = models.CharField(max_length=100)
     zipcode = models.CharField(max_length=100)
 
     def __str__(self):
         return self.address
+    
+class Order(models.Model):
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('On Process', 'On Process'),
+        ('Delivered', 'Delivered'),
+        ('Cancelled', 'Cancelled'),
+        ('Completed', 'Completed'),
+    ]
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    shippingaddress =models.ForeignKey(ShippingAddress, on_delete=models.CASCADE, null=True)
+    quantity = models.IntegerField()
+    order_date = models.DateTimeField(auto_now_add=True)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
+    paid = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if self.status == "Delivered":
+            self.product.stock -= self.quantity
+            self.product.save()
+        super().save(*args, **kwargs)

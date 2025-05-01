@@ -230,7 +230,7 @@
           <a href="#"><i class="fas fa-money-bill-wave"></i> Transactions</a>
           <a href="{% url 'scan' %}"><i class="fas fa-qrcode"></i> Scan Now</a>
           <a href="#knowledge-section"><i class="fas fa-book-open"></i> Library</a>
-          <a href="#Team"><i class="fas fa-users"></i> Team</a>
+          <a href="#team-section"><i class="fas fa-users"></i> Team</a>
 
         </div>
         <div class="burger" id="burger" onclick="toggleNav()">
@@ -243,7 +243,7 @@
         <P style=" font-weight: bold; font-size: 25px;padding: 15px; justify-items: start; margin-left: 5in; color: black;"></P>
         <div class="search-box">
             <input type="text" id="searchBox" placeholder="Search...">
-            <button class="btn btn-outline-primary" style="font-size: 28px;" onclick="searchUser()" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Hanapin ang Tao">Search</button>
+            <button class="btn btn-outline-primary" style="font-size: 28px;" onclick="search()" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="Maghanap">Search</button>
         </div>
         <div class="icons">
             <div class="logout-icon" onclick="toggleLogout()" style="cursor: pointer; font-size: 35px; margin-bottom: 10px; margin-top: 20px; margin-right: 10px;">
@@ -267,13 +267,13 @@
         <div class="overlay-content">
             <div class="card-container-wrapper">
                 <!-- Banana Disease Scanner -->
-                <a href="{% url 'scan' %}" class="card-container" style="text-decoration: none;">
+                <a href="{% url 'diseasedetect' %}" class="card-container" style="text-decoration: none;">
                     <img src="/static/img/Disease.gif" alt="Leaf Disease">
                     <p title="I-scan ang dahon/prutas/puno ng saging para sa sakit">Scan Disease Banana Leaf/Fruit/Trunk</p>
                 </a>
     
                 <!-- Banana Variety Scanner -->
-                <a href="{% url 'scan' %}" class="card-container" style="text-decoration: none;">
+                <a href="{% url 'varietydetect' %}" class="card-container" style="text-decoration: none;">
                     <img src="/static/img/Variety.gif" alt="Banana Variety">
                     <p title="I-scan upang makilala ang uri ng saging">Scan Banana Variety</p>
                 </a>
@@ -305,7 +305,7 @@
             </div>
         </div>
         <!-- Team Section -->
-        <div class="team-section" id="team">
+        <div class="team-section" id="team-section">
             <h1 class="team-title">MEET THE TEAM</h1>
             <div class="team-container">
                 <div class="team-member">

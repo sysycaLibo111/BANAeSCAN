@@ -637,7 +637,7 @@ body {
   <nav>
     <div class="logo">
       <img src="/static/img/LogoW.png" alt="BANAeScan Logo">
-      <span >BANAe-SCAN</span>
+      <span style="font-size: 30px;">BANAe-SCAN</span>
     </div>
     <div class="burger">
       <div></div>
@@ -646,32 +646,35 @@ body {
     </div>
     <div class="menu">
       <a href="#about" >
-        <i class="bi bi-info-circle" style="margin-right: 12px;"></i>Tungkol
+        <i class="bi bi-info-circle" style="margin-right: 12px;"></i>About
     </a>
-      <a href="#services"><i class="bi bi-tools" style="margin-right: 10px;"></i>MgaSerbisyo
+      <a href="#services"><i class="bi bi-tools" style="margin-right: 10px;"></i>Services
       </a>
-      <a href="#team"><i class="bi bi-people" style="margin-right: 12px;"></i>Grupo</a>
+      <a href="#team"><i class="bi bi-people" style="margin-right: 12px;"></i>Team</a>
     </div>
   </nav>
 
   <div class="image-container">
     <div class="overlay-content">
+      <select id="languageSelect" onchange="changeLanguage()" style="position: absolute; top: 50px; left: 20px; height: 20px; font-size: 14px; margin-left: 25px;">
+        <option value="en">English</option>
+        <option value="ph">Tagalog</option>
+      </select>
       <img src="/static/img/LogoW.png" alt="Banana Logo">
       <div class="text-content">
         <div class="card"> 
         <span>Welcome to BANAe-SCAN: Smart Farming Made Simple! 🌱📸</span>
-        <p> Ang iyong all-in-one na plataporma para sa pagtukoy ng sakit 
-          ng saging at pagkilala sa iba't ibang uri! I-scan lamang ang iyong 
-          halaman ng saging upang masuri ang mga sakit at matuklasan ang uri nito. 
-          Dagdag pa, tuklasin ang aming tindahan upang bumili ng mga de-kalidad na 
-          produktong may kaugnayan sa saging, na tinitiyak ang mas malusog na mga 
-          pananim at mas magandang ani.
+        <p> Your all-in-one platform for detecting banana diseases and 
+          identifying different varieties! Simply scan your banana plant to
+           diagnose diseases and discover its type. Plus, explore our store 
+           to purchase high-quality banana-related products, ensuring healthier 
+           crops and better harvests.
         </p>
         <p>🌿 Scan. Identify. Shop. Grow. 🛒 Add to cart now!</p>
         
-        <!-- ✅ Buttons Added with Reverse Fix -->
+
         <div class="buttons">
-          <a href="{% url 'login' %}" class="btn btn-yellow">Mag Login</a><a href="{% url 'signup_view' %}" class="btn btn-yellow">Mag Sign Up</a>
+          <a href="{% url 'login' %}" class="btn btn-yellow">Login</a><a href="{% url 'signup_view' %}" class="btn btn-yellow">Sign Up</a>
 
         </div>
 
@@ -681,25 +684,25 @@ body {
   </div>
 
   <section id="services" class="services-section">
-    <span class="services-title">Mga Serbisyo</span>
+    <span class="services-title">Services</span>
     <div class="container">
       <div class="row g-4">
         <div class="col-md-4">
           <div class="service-card">
             <img src="{% static 'img/Disease.gif' %}" alt="Scanning Service" class="service-gif">
-            <p class="service-text">Pagtukoy ng Sakit ng Saging</p>
+            <p class="service-text">Banana Disease Detection</p>
           </div>
         </div>
         <div class="col-md-4">
           <div class="service-card">
             <img src="{% static 'img/Variety.gif' %}" alt="Vriety Service" class="service-gif">
-            <p class="service-text">Pagtukoy ng Uri ng Sanging</p>
+            <p class="service-text"> Banana Variety Identification</p>
           </div>
         </div>
         <div class="col-md-4">
           <div class="service-card">
             <img src="{% static 'img/Store.gif' %}" alt="Expert Advice" class="service-gif">
-            <p class="service-text">Pamilihan</p>
+            <p class="service-text">Marketplace</p>
           </div>
         </div>
       </div>
@@ -735,12 +738,102 @@ body {
     </div>
   </div>
   <!-- Footer-->
+  <footer style="background-color: #222; color: #fff; padding: 40px 0; font-family: Arial, sans-serif;">
+    <div style="max-width: 1200px; margin: auto; display: flex; flex-wrap: wrap; justify-content: space-between;">
+  
+      <!-- About Us Column -->
+      <div style="flex: 1 1 250px; margin: 20px;">
+        <h3 style="color: #f0a500;">About Us</h3>
+        <p style="line-height: 1.6;">BANAe-SCAN is committed to empowering local banana farmers with smart tools for disease detection and online marketing, fostering better harvests and market connections.</p>
+        <div style="margin-top: 15px;">
+          <a href="https://facebook.com" target="_blank" style="margin-right: 10px; color: #fff; font-size: 24px; text-decoration: none;">📘</a>
+          <a href="https://instagram.com" target="_blank" style="margin-right: 10px; color: #fff; font-size: 24px; text-decoration: none;">📸</a>
+          <a href="https://t.me" target="_blank" style="color: #fff; font-size: 24px; text-decoration: none;">✈️</a>
+        </div>
+      </div>
+  
+      <!-- Quick Links Column -->
+      <div style="flex: 1 1 200px; margin: 20px;">
+        <h3 style="color: #f0a500;">Quick Links</h3>
+        <ul style="list-style: none; padding: 0;">
+          <li><a href="#" style="color: #ddd; text-decoration: none; display: block; margin: 8px 0;">About</a></li>
+          <li><a href="#" style="color: #ddd; text-decoration: none; display: block; margin: 8px 0;">Services</a></li>
+          <li><a href="#" style="color: #ddd; text-decoration: none; display: block; margin: 8px 0;">Team</a></li>
+          <li><a href="#" style="color: #ddd; text-decoration: none; display: block; margin: 8px 0;">Terms & Conditions</a></li>
+          <li><a href="#" style="color: #ddd; text-decoration: none; display: block; margin: 8px 0;">Help</a></li>
+        </ul>
+      </div>
+  
+      <!-- Contact Us Column -->
+      <div style="flex: 1 1 250px; margin: 20px;">
+        <h3 style="color: #f0a500;">Contact Us</h3>
+        <p style="margin: 8px 0;">📍 Socorro, Oriental Mindoro</p>
+        <p style="margin: 8px 0;">📞 0912-345-6789</p>
+        <p style="margin: 8px 0;">📞 0934-567-8901</p>
+        <p style="margin: 8px 0;">📧 banaescan@gmail.com</p>
+      </div>
+  
+    </div>
+  </footer>
+  
 <footer class="py-2" style="background: rgb(228, 141, 11)">
+
   <div class="container"><p class="m-0 text-center text-white">Copyright &copy; BANAe-SCAN system 2025</p></div>
 </footer>
 
-  <script src="/static/js/script.js"></script>
+  
   <script>
+    function changeLanguage() {
+  var lang = document.getElementById("languageSelect").value;
+
+  if (lang === "ph") {
+    // Nav
+    document.getElementById("navAbout").innerText = "Tungkol";
+    document.getElementById("navServices").innerText = "Serbisyo";
+    document.getElementById("navTeam").innerText = "Koponan";
+
+    // Landing Text
+    document.getElementById("welcomeTitle").innerText = "Maligayang Pagdating sa BANAe-SCAN: Smart Farming Made Simple! 🌱📸";
+    document.getElementById("welcomeDesc").innerText = "Ang iyong all-in-one na plataporma para sa pagtukoy ng sakit ng saging at pagkilala ng iba't ibang klase nito!";
+
+    // Services Section
+    document.getElementById("servicesTitle").innerText = "Serbisyo";
+    document.getElementById("service1").innerText = "Pagtukoy ng Sakit ng Saging";
+    document.getElementById("service2").innerText = "Pagkilala ng Uri ng Saging";
+    document.getElementById("service3").innerText = "Pamilihan";
+
+    // Team Section
+    document.getElementById("teamTitle").innerText = "Kilalanin ang Koponan";
+
+    // Footer
+    document.getElementById("footerAboutTitle").innerText = "Tungkol sa Amin";
+    document.getElementById("footerAboutDesc").innerText = "Ang BANAe-SCAN ay nagsusulong ng makabagong tools para sa mga lokal na magsasaka ng saging...";
+    document.getElementById("footerQuickLinks").innerText = "Mga Link";
+    document.getElementById("footerContact").innerText = "Makipag-ugnayan";
+
+  } else {
+    // English default
+    document.getElementById("navAbout").innerText = "About";
+    document.getElementById("navServices").innerText = "Services";
+    document.getElementById("navTeam").innerText = "Team";
+
+    document.getElementById("welcomeTitle").innerText = "Welcome to BANAe-SCAN: Smart Farming Made Simple! 🌱📸";
+    document.getElementById("welcomeDesc").innerText = "Your all-in-one platform for detecting banana diseases and identifying different varieties!";
+
+    document.getElementById("servicesTitle").innerText = "Services";
+    document.getElementById("service1").innerText = "Banana Disease Detection";
+    document.getElementById("service2").innerText = "Banana Variety Identification";
+    document.getElementById("service3").innerText = "Marketplace";
+
+    document.getElementById("teamTitle").innerText = "Meet the Team";
+
+    document.getElementById("footerAboutTitle").innerText = "About Us";
+    document.getElementById("footerAboutDesc").innerText = "BANAe-SCAN is committed to empowering local banana farmers...";
+    document.getElementById("footerQuickLinks").innerText = "Quick Links";
+    document.getElementById("footerContact").innerText = "Contact Us";
+  }
+}
+
     document.addEventListener("DOMContentLoaded", function() {
     const burger = document.querySelector(".burger");
     const menu = document.querySelector(".menu");

@@ -13,7 +13,7 @@ from django.http import HttpResponse
 from bananae.supabase_config import supabase 
 from django.contrib.auth.hashers import make_password
 import requests
-from .models import CustomUser,Customer, Product, Category, Order, Cart, Cartitems
+from .models import CustomUser,Customer, Product, Category, Order, Cart, Cartitems,ShippingAddress
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -30,9 +30,10 @@ from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import CategoryForm,ProductForm,UserProfileForm,  EditProfileForm
+from .forms import CategoryForm,ProductForm,UserProfileForm,  EditProfileForm,ShippingAddressForm
 from .supabase_helper import upload_image_to_supabase
 import logging
+from django.core.files.storage import FileSystemStorage
 import io
 import tempfile
 from reportlab.pdfgen import canvas
@@ -758,13 +759,38 @@ def product_print(request):
 # Oders
 
 @supabase_login_required
+# def orders_part(request):
+#     if request.user.role != "Admin":
+#         return redirect("user_dashboard")  # Restrict non-admins
+#     new_orders = Order.objects.filter(status='pending')
+#     orders = Order.objects.all()
+#     return render(request, "escan/Admin/E-commerce/orders_part.html", {"new_orders": new_orders,"orders": orders})
+
+
+# def update_order_status(request, order_id):
+#     order = get_object_or_404(Order, id=order_id)
+#     if request.method == 'POST':
+#         new_status = request.POST.get('status')
+#         order.status = new_status
+#         order.save()
+#     return redirect('orders_part') 
+
 def orders_part(request):
-    if request.user.role != "Admin":
-        return redirect("user_dashboard")  # Restrict non-admins
+    new_orders = Order.objects.filter(status='pending')
+    total_orders = Order.objects.exclude(status='pending').order_by('status')
 
-    orders = Order.objects.all()
-    return render(request, "escan/Admin/E-commerce/orders_part.html", {"orders": orders})
+    return render(request, 'escan/Admin/E-commerce/orders_part.html', {
+        'new_orders': new_orders,
+        'total_orders': total_orders
+    })
 
+def update_order_status(request, order_id):
+    if request.method == 'POST':
+        new_status = request.POST.get('status')
+        order = get_object_or_404(Order, pk=order_id)
+        order.status = new_status
+        order.save()
+        return redirect('orders_part')  
 # Graphs
 def user_graph_view(request):
     # Fetch users with the role 'User '
@@ -836,7 +862,7 @@ def update_userprofile(request):
     return render(request, "escan/User/user_dashboard.html", {'form': form})
 
 
-# #user E-commerce side
+#user E-commerce side
 @login_required
 def user_product_list(request):
     product_list = Product.objects.filter(is_deleted=False).order_by("name")
@@ -852,12 +878,82 @@ def user_product_list(request):
     })
 
 
+# @login_required
+# def user_dashboard(request):
+#     customer, created = Customer.objects.get_or_create(user=request.user)
+#     cart, created = Cart.objects.get_or_create(customer=customer, completed=False)
+#     products = Product.objects.filter(is_deleted=False) 
+#     return render(request, 'escan/User/user_dashboard.html', {'products': products,'cart': cart})
+
+# @login_required
+# def update_item(request):
+#     data = json.loads(request.body)
+#     productId = data['productId']
+#     action = data['action']
+    
+#     customer = request.user.customer
+#     product = Product.objects.get(id=productId)
+#     cart, created = Cart.objects.get_or_create(customer=customer, completed=False)
+#     cart_item, created = cart.cartitems_set.get_or_create(product=product)
+
+#     if action == 'add':
+#         cart_item.quantity += 1
+#         cart_item.save()
+    
+#     # Return the updated cart item count
+#     cart_item_count = cart.get_itemtotal()  # Use the method to get the total count
+#     return JsonResponse({'cartItemCount': cart_item_count}, safe=False)
+
+# def cart(request):
+#     if request.user.is_authenticated:
+#         customer, created = Customer.objects.get_or_create(user=request.user)
+#         cart, created = Cart.objects.get_or_create(customer = customer, completed = False)
+#         cartitems = cart.cartitems_set.all()
+#     else:
+#         cartitems = []
+#         cart = {"get_cart_total": 0, "get_itemtotal": 0}
+
+#     return render(request, 'escan/User/E-commerceUser/cart.html', {'cartitems' : cartitems, 'cart':cart})
+
+# @csrf_exempt
+# @login_required
+# def checkout(request):
+#     if request.method == 'POST':
+#         customer = Customer.objects.get(user=request.user)
+#         cart_items = Cart.objects.filter(customer=customer)
+#         total_amount = sum(item.total_price for item in cart_items)
+
+#         # Create an order
+#         order = Order.objects.create(customer=customer, total_amount=total_amount)
+
+#         # Update the customer's total spent
+#         customer.total_spent += total_amount
+#         customer.save()
+
+#         for item in cart_items:
+#             item.product.stock -= item.quantity
+#             item.product.save()
+#         cart_items.delete()  # Clear the cart after checkout
+
+#         return redirect('order_summary')
+
+#     product_id = request.GET.get('product_id')
+#     quantity = request.GET.get('quantity')
+#     if product_id and quantity:
+#         product = get_object_or_404(Product, id=product_id)
+#         total_amount = product.price * int(quantity)
+#         return render(request, 'E-commerceUser', {'product': product, 'quantity': quantity, 'total_amount': total_amount})
+
+#     return render(request, 'escan/User/E-commerceUser/checkout.html')
+
+
+
 @login_required
 def user_dashboard(request):
     customer, created = Customer.objects.get_or_create(user=request.user)
     cart, created = Cart.objects.get_or_create(customer=customer, completed=False)
     products = Product.objects.filter(is_deleted=False) 
-    return render(request, 'escan/User/user_dashboard.html', {'products': products,'cart': cart})
+    return render(request, 'escan/User/user_dashboard.html', {'products': products, 'cart': cart})
 
 @login_required
 def update_item(request):
@@ -873,64 +969,226 @@ def update_item(request):
     if action == 'add':
         cart_item.quantity += 1
         cart_item.save()
-    
+    elif action == 'remove':
+        if cart_item.quantity > 1:
+            cart_item.quantity -= 1
+            cart_item.save()
+        else:
+            cart_item.delete()  # Remove item if quantity is 0
+
     # Return the updated cart item count
     cart_item_count = cart.get_itemtotal()  # Use the method to get the total count
     return JsonResponse({'cartItemCount': cart_item_count}, safe=False)
 
+@login_required
+def add_to_cart(request, product_id):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        quantity = data.get('quantity', 1)
+
+        customer = request.user.customer
+        product = get_object_or_404(Product, id=product_id)
+        cart, created = Cart.objects.get_or_create(customer=customer, completed=False)
+
+        cart_item, created = cart.cartitems_set.get_or_create(product=product)
+        cart_item.quantity += int(quantity)
+        cart_item.save()
+
+        # Return the updated cart item count
+        cart_item_count = cart.get_itemtotal()  # Use the method to get the total count
+        return JsonResponse({'success': True, 'item_count': cart_item_count})
+    
+    return JsonResponse({'success': False}, status=400)
+
 def cart(request):
     if request.user.is_authenticated:
         customer, created = Customer.objects.get_or_create(user=request.user)
-        cart, created = Cart.objects.get_or_create(customer = customer, completed = False)
+        cart, created = Cart.objects.get_or_create(customer=customer, completed=False)
         cartitems = cart.cartitems_set.all()
     else:
         cartitems = []
         cart = {"get_cart_total": 0, "get_itemtotal": 0}
 
-    return render(request, 'escan/User/E-commerceUser/cart.html', {'cartitems' : cartitems, 'cart':cart})
+    return render(request, 'escan/User/E-commerceUser/cart.html', {'cartitems': cartitems, 'cart': cart})
+
+@login_required
+def remove_item(request, item_id):
+    if request.method == 'POST':
+        cart_item = get_object_or_404(Cartitems, id=item_id)
+        cart_item.delete()  # Remove the item from the cart
+
+        # Return the updated cart item count
+        cart = Cart.objects.get(customer=request.user.customer, completed=False)
+        cart_item_count = cart.get_itemtotal()
+        return JsonResponse({'success': True, 'cartItemCount': cart_item_count})
+
+    return JsonResponse({'success': False}, status=400)
 
 @csrf_exempt
 @login_required
 def checkout(request):
     if request.method == 'POST':
         customer = Customer.objects.get(user=request.user)
-        cart_items = Cart.objects.filter(customer=customer)
+        cart = Cart.objects.get(customer=customer, completed=False)
+        cart_items = cart.cartitems_set.all()
         total_amount = sum(item.total_price for item in cart_items)
 
         # Create an order
         order = Order.objects.create(customer=customer, total_amount=total_amount)
 
-        # Update the customer's total spent
-        customer.total_spent += total_amount
-        customer.save()
-
+        # Update the product stock and clear the cart
         for item in cart_items:
             item.product.stock -= item.quantity
             item.product.save()
         cart_items.delete()  # Clear the cart after checkout
 
-        return redirect('order_summary')
-
-    product_id = request.GET.get('product_id')
-    quantity = request.GET.get('quantity')
-    if product_id and quantity:
-        product = get_object_or_404(Product, id=product_id)
-        total_amount = product.price * int(quantity)
-        return render(request, 'E-commerceUser', {'product': product, 'quantity': quantity, 'total_amount': total_amount})
+        return redirect('cart')
 
     return render(request, 'escan/User/E-commerceUser/checkout.html')
 
+@login_required
+def add_shipping_address(request, cart_id):
+    customer = request.user.customer
+    cart = get_object_or_404(Cart, id=cart_id, customer=customer, completed=False)
 
+    # Check if the customer already has a shipping address
+    existing_address = ShippingAddress.objects.filter(customer=customer).first()
 
+    if request.method == 'POST':
+        phone_number = request.POST.get('phone_number', '').strip()
+        address = request.POST.get('address', '').strip()
+        city = request.POST.get('city', '').strip()
+        province = request.POST.get('state', '').strip()
+        zipcode = request.POST.get('zipcode', '').strip()
 
+        # Check if all required fields are filled
+        if not all([phone_number, address, city, province, zipcode]):
+            messages.error(request, "Please fill out all shipping address fields.")
+            return redirect('cart')
+
+        if existing_address:
+            # If there's an existing address, update it
+            existing_address.phone_number = phone_number
+            existing_address.address = address
+            existing_address.city = city
+            existing_address.province = province
+            existing_address.zipcode = zipcode
+            existing_address.save()
+            messages.success(request, "Shipping address updated successfully.")
+        else:
+            # If no existing address, create a new one
+            ShippingAddress.objects.create(
+                customer=customer,
+                cart=cart,
+                phone_number=phone_number,
+                address=address,
+                city=city,
+                province=province,
+                zipcode=zipcode
+            )
+            messages.success(request, "Shipping address added successfully.")
+
+        return redirect('cart', cart_id=cart.id)  # Assuming you have a checkout page view
+
+    return render(request, 'escan/User/E-commerceUser/cart.html', {'cart': cart})
+
+@login_required
+def edit_shipping_address(request, address_id):
+    address = get_object_or_404(ShippingAddress, id=address_id)
+
+    if request.method == 'POST':
+        form = ShippingAddressForm(request.POST, instance=address)
+        if form.is_valid():
+            form.save()  # Save the updated address
+            messages.success(request, 'Shipping address updated.')
+            return redirect('cart')
+    else:
+        form = ShippingAddressForm(instance=address)
+
+    return render(request, 'escan/User/E-commerceUser/cart.html', {'form': form})
 # Scan
-def detect(request):
-    return render(request, "escan/User/Scan/Detect.html")
-# @login_required
-# def order_summary(request):
-#     customer = Customer.objects.get(user=request.user)
-#     orders = Order.objects.filter(customer=customer)
-#     return render(request, 'order_summary.html', {'orders': orders, 'customer': customer})
+def diseasedetect(request):
+    return render(request, "escan/User/Scan/diseasedetect.html")
+
+def varietydetect(request):
+    return render(request, "escan/User/Scan/varietydetect.html")
+
+def predict(request):
+    if request.method == 'POST' and request.FILES['image']:
+        image = request.FILES['image']
+        
+        # Save the uploaded image
+        fs = FileSystemStorage()
+        filename = fs.save(image.name, image)
+        uploaded_file_url = fs.url(filename)
+        
+        # Make the prediction based on the uploaded image
+        predicted_class, confidence = predict_plant_disease(os.path.join(settings.MEDIA_ROOT, filename))
+        
+        # Store the result in context to send it to the result page
+        context = {
+            'uploaded_file_url': uploaded_file_url,
+            'predicted_class': predicted_class,
+            'confidence': confidence,
+        }
+        
+        return render(request, 'result.html', context)  # Result page to show the result
+    
+    return render(request, 'home.html')  # The page to upload the image
+
+def predict_plant_disease(image_path):
+    # Load the image using PIL
+    img = Image.open(image_path)
+    
+    # Resize the image to match the input shape of your model (150x150 pixels)
+    img = img.resize((150, 150))  # Update this size based on your model's input shape
+    img = np.array(img)  # Convert image to a numpy array
+
+    # If the image has an alpha channel (RGBA), remove it (convert to RGB)
+    if img.shape[-1] == 4:
+        img = img[..., :3]
+
+    # Normalize the image (you may need to adjust this based on your model's training)
+    img = img / 255.0
+    
+    # Expand dimensions to match the batch size required by the model
+    img = np.expand_dims(img, axis=0)  # Shape becomes (1, 150, 150, 3)
+    
+    # Make the prediction using your trained model
+    prediction = model.predict(img)
+    
+    # Map prediction to the class labels
+    class_labels = [
+        "Aphids",
+        "Aphids",
+        "Cercospora Leaf Spot",
+        "Defect Eggplant",
+        "Flea Beetles",
+        "Healthy Eggplant Leaf",
+        "Insect Pest Disease",
+        "Leaf Spot Disease",
+        "Mosaic Virus Disease",
+        "Phytophora Blight",
+        "Powdery Mildew",
+        "White Mold Disease",
+        "Wilt Disease"
+    ]
+    
+    # Get the predicted class and the confidence score (percentage)
+    predicted_class_idx = np.argmax(prediction)  # Get index of the highest probability
+    predicted_class = class_labels[predicted_class_idx]  # Map index to class label
+    confidence = round(100 * np.max(prediction), 2)  # Confidence in percentage
+
+    return predicted_class, confidence
+
+def diseaseresult(request):
+    # This view can be left empty or used if you decide to separate logic further
+    return render(request, 'diseaseresult.html')
+
+
+
+
+
 # def google_signup(request):
 #     return redirect(google_auth_redirect())
 

@@ -10,9 +10,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>  
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
+
     
     <style>
         body {
@@ -132,7 +131,7 @@ margin-left: 50px;
     }
 
     .nav-bar {
-        display: flex;
+    display: flex;
     justify-content: space-between; 
     align-items: center; 
     padding: 10px 20px; 
@@ -142,7 +141,7 @@ margin-left: 50px;
 
 .search-box {
     justify-self: end;
-    font-size: 25px;
+    font-size: 1.5rem;
     color: white;
     margin-left: 7in;
 
@@ -289,6 +288,23 @@ margin-left: 50px;
 .card {
     margin-bottom: 20px; /* Space between cards */
 }
+
+.profile-icon img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .modal-header, .modal-footer {
+      background-color: #f1c23e;
+    }
+
+    .modal-title {
+      color: #333;
+      font-size: 20px;
+      font-weight: bold;
+    }
     </style>
 </head>
 <body>
@@ -297,13 +313,13 @@ margin-left: 50px;
             <img src="{% static 'img/LogoW.png' %}" alt="Logo" class="logo">
         </div>
         <div class="menu">
-            <a href="{% url 'user_dashboard' %}"><i class="fas fa-tachometer-alt"></i> Home</a>
-            <a href="#"><i class="fas fa-shopping-cart"></i> Order</a>
+            <a href="{% url 'user_dashboard' %}"><i class="fas fa-tachometer-alt"></i>Home</a>
+            <a href="{% url 'checkout' %}"><i class="fas fa-shopping-cart"></i> Order</a>
             <a href="#"><i class="fas fa-truck"></i> To Ship</a>
             <a href="#"><i class="fas fa-money-bill-wave"></i> Transactions</a>
             <a href="{% url 'scan' %}"><i class="fas fa-qrcode"></i> Scan Now</a>
-            <a href="{% url 'scan' %}"><i class="fas fa-book-open"></i> Library</a>
-            <a hrhref="{% url 'scan' %}"><i class="fas fa-users"></i> Team</a>
+            <a href="{% url 'scan' %}#knowledge-section"><i class="fas fa-book-open"></i> Library</a>
+            <a href="{% url 'scan' %}team-section"><i class="fas fa-users"></i> Team</a>
 
         </div>
         <div class="burger" id="burger" onclick="toggleNav()">
@@ -322,13 +338,16 @@ margin-left: 50px;
             </div>
             <form class="d-flex">
                 <a href="{% url 'cart' %}">
-                    <div class='cart_container'>
-                        <i class="fas fa-shopping-cart" style="font-size: 30px; color: black;margin-top: 10px;"></i>
-                        <div class='cart-item-count'><h4>{{ cart.get_itemtotal }}</h4></div>
+                    <div class="cart_container" style="position: relative;">
+                        <!-- Positioned at the top-right corner of the container -->
+                        <div class="cart-item-count" style="position: absolute; top: 0; left: 30px; background-color: red; color: white; padding: 1px 8px; border-radius: 50%;">
+                            <h5>{{ cart.get_itemtotal }}</h5>
+                        </div>
+                        <i class="fas fa-shopping-cart" style="font-size: 30px; color: black; margin-top: 10px;"></i>
                     </div>
-                    
                 </a>
             </form>
+            
             <div class="icons">
                 <div class="message-icon" onclick="toggleMessages()" style="cursor: pointer;">
                     <i class="fas fa-comments" style="color: #0a0318;"></i>
@@ -346,7 +365,7 @@ margin-left: 50px;
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="profileModalLabel">Edit Profile</h5>
+                                <h4 class="modal-title" id="profileModalLabel">EDIT PROFILE</h4>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <form method="POST" enctype="multipart/form-data" id="profileForm">
@@ -395,11 +414,12 @@ margin-left: 50px;
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                                    <button type="submit" class="btn" style="background-color: darkgreen;"> Save Changes</button>
                                 </div>
                             </form>
                         </div>
                     </div>
+                
                 </div>
 
                 <div class="logout-icon" onclick="toggleLogout()" style="cursor: pointer;">
@@ -411,17 +431,17 @@ margin-left: 50px;
             <div class='row'>
                 {% for product in products %}
                     <div class='col-md-4 col-lg-4'>
-                        <div class="card" style="width: 90%; background-color: rgb(39, 138, 10); height: 90%; ">
+                        <div class="card" style="width: 90%; background-color: rgb(58, 114, 40); height: 80%; ">
                             <img style="height: 70%;" src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
                             <div class="card-body">
                                 <h3 class="card-title">{{ product.name }}</h3>
-                                <p style="text-align: justify;">{{ product.description }}</p>
+                                <p style="text-align: justify; color: white;">{{ product.description }}</p>
                                 <div class="d-flex align-items-center gap-2">
                                     <h4 class="card-text mb-0">Price ₱{{ product.price }}</h4>
                                     <input type="number" class="quantity-input" data-price="{{ product.price }}" value="1" min="1" style="width: 60px;">
                                     <p class="mb-0">Total: ₱ <span class="total-price">{{ product.price }}</span></p>
-                                    <a class="btn  addtocart" style="background-color: #c1b22e;" data-action="add" data-product="{{ product.id }}">Add to Cart</a>
-                                  </div>
+                                    <a class="btn addtocart" style="background-color: yellow;" data-action="add" data-product="{{ product.id }}">Add to Cart</a>
+                                </div>
                                   
                             </div>
                         </div>
@@ -438,6 +458,47 @@ margin-left: 50px;
 
     
     <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+    const addToCartButtons = document.querySelectorAll('.addtocart');
+
+    quantityInputs.forEach(input => {
+        input.addEventListener('input', function () {
+            const price = parseFloat(this.getAttribute('data-price'));
+            const quantity = parseInt(this.value);
+            const totalPriceElement = this.parentElement.querySelector('.total-price');
+            totalPriceElement.textContent = (price * quantity).toFixed(2);
+        });
+    });
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const productId = this.getAttribute('data-product');
+            const quantity = this.parentElement.querySelector('.quantity-input').value;
+
+            fetch(`/add_to_cart/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ quantity: quantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Item added to cart!');
+                    // Update cart item count and other elements
+                    document.querySelector('.cart-item-count h4').textContent = data.item_count; // Update cart item count
+                } else {
+                    alert('Error adding item to cart.');
+                }
+            });
+        });
+    });
+});
+
+
     // Function to update the datetime every second
         function updateTime() {
             const now = new Date();

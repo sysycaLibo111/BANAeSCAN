@@ -158,7 +158,10 @@
 </head>
 <body>
   <div class="card">
-    <button class="close-button" onclick="toggleLanguage()" style="top: 50px; right: 50px; background-color: #e4b337;font-family: 'Times New Roman', Times, serif;">PH</button>
+    <select id="languageSelect" onchange="changeLanguage()" style="position: absolute; top: 50px; left: 20px; height: 20px; font-size: 14px; margin-left: 25px;">
+      <option value="en">English</option>
+      <option value="ph">Tagalog</option>
+    </select>
     <div class="form-container">
       <button class="close-button" onclick="window.location.href='{% url 'landing_page' %}'">X</button>
       <h1 class="form-title" id="formTitle">Sign Up</h1>
@@ -197,7 +200,7 @@
           <input type="password" name="password" placeholder="Password" id="password" required>
         </div>
         <div class="input-group">
-          <label for="image_url" class="form-label" id="imageLabel">Product Image</label>
+          <label for="image_url" class="form-label" id="imageLabel">Profile Image</label>
           <input type="file" name="image_url">
         </div>
         <div class="input-group">
@@ -217,25 +220,32 @@
   </div>
 
   <script>
-    let isTagalog = false;
+   function changeLanguage() {
+  var lang = document.getElementById("languageSelect").value;
 
-    function toggleLanguage() {
-      isTagalog = !isTagalog;
-      document.getElementById("formTitle").textContent = isTagalog ? "Mag Sign Up" : "Sign Up";
-      document.getElementById("firstName").placeholder = isTagalog ? "Pangalan" : "First Name";
-      document.getElementById("lastName").placeholder = isTagalog ? "Apelyido" : "Last Name";
-      document.getElementById("username").placeholder = isTagalog ? "Username" : "Username";
-      document.getElementById("email").placeholder = isTagalog ? "Email" : "Email";
-      document.getElementById("password").placeholder = isTagalog ? "Password" : "Password";
-      document.getElementById("submitBtn").textContent = isTagalog ? "Mag-sign Up" : "Sign Up";
-      document.getElementById("loginText").innerHTML = isTagalog
-        ? "Mayroon ka na bang account? <a href='{% url 'login' %}' id='loginLink'>Mag-login dito</a>"
-        : "Already have an account? <a href='{% url 'login' %}' id='loginLink'>Login here</a>";
-      document.getElementById("imageLabel").textContent = isTagalog ? "Larawan ng Produkto" : "Product Image";
+  if (lang === "ph") {
+    document.getElementById("formTitle").innerText = "Magparehistro";
+    document.getElementById("firstName").placeholder = "Pangalan";
+    document.getElementById("lastName").placeholder = "Apelyido";
+    document.getElementById("username").placeholder = "Username";
+    document.getElementById("email").placeholder = "Email";
+    document.getElementById("password").placeholder = "Password";
+    document.getElementById("imageLabel").innerText = "Larawan ng Profile";
+    document.getElementById("submitBtn").innerText = "Magparehistro";
+    document.getElementById("loginText").innerHTML = "May account ka na? <a href=\"{% url 'login' %}\" id=\"loginLink\">Mag-login dito</a>";
+  } else {
+    document.getElementById("formTitle").innerText = "Sign Up";
+    document.getElementById("firstName").placeholder = "First Name";
+    document.getElementById("lastName").placeholder = "Last Name";
+    document.getElementById("username").placeholder = "Username";
+    document.getElementById("email").placeholder = "Email";
+    document.getElementById("password").placeholder = "Password";
+    document.getElementById("imageLabel").innerText = "Profile Image";
+    document.getElementById("submitBtn").innerText = "Sign Up";
+    document.getElementById("loginText").innerHTML = "Already have an account? <a href=\"{% url 'login' %}\" id=\"loginLink\">Login here</a>";
+  }
+}
 
-      // Change button label itself
-      document.querySelector(".translate-button").textContent = isTagalog ? "English" : "Tagalog";
-    }
   </script>
 </body>
 </html>

@@ -302,7 +302,7 @@ margin-left: 50px;
     </div>
     <div class="content">
         <button class="btn mb-3 add-btn" data-bs-toggle="modal" data-bs-target="#addUserModal">
-            <i class="fas fa-user-plus"></i>Magdagdag ng Bagong User
+            <i class="fas fa-user-plus"></i>Add New User
         </button>
         <button class="btn btn-undo" onclick="undoAction()" data-bs-toggle="popover" data-bs-trigger="hover" data-bs-content="I-undo ang huling aksyon">
             <i class="fas fa-undo"></i> Undo
@@ -314,15 +314,15 @@ margin-left: 50px;
                     <thead class="table" style="position: sticky; top: 0; z-index: 2;">
                         <tr>
                             <!-- <th>ID</th> -->
-                            <th>Unang Pangalan</th>
-                            <th>Apelyido</th>
-                            <th>Pangalang Ginagamit</th>
+                            <th>First Name</th>
+                            <th>Last Name</th>
+                            <th>Username</th>
                             <th>Email</th>
                             <th>Image</th>
                             <th class="date">Date Joined</th>
                             <th>Is Active</th>
                             <th>Role</th>
-                            <th>Mga Aksyon</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -342,12 +342,12 @@ margin-left: 50px;
                             <td>{{ user.role }}</td>
                             <td>
                                 <button class="actions-btn" data-bs-toggle="modal" data-bs-target="#editUserModal{{ user.id }}">
-                                    <i class="bi bi-pencil-square"></i> Baguhin
+                                    <i class="bi bi-pencil-square"></i> Edit
                                 </button>
                                 
                                 <a href="{% url 'delete_user' user.id %}" class="btn btn-danger btn-sm action-btn"
                                    onclick="return confirm('Are you sure you want to delete this user?');">
-                                    <i class="fas fa-trash"></i> Tanggalin
+                                    <i class="fas fa-trash"></i> Delete
                                 </a>
                             </td>
                         </tr>
@@ -364,22 +364,22 @@ margin-left: 50px;
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addUserModalLabel">Magdagdag ng Bagong User</h5>
+                    <h5 class="modal-title" id="addUserModalLabel">Add New User</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         <div class="mb-2">
-                            <label for="first_name" class="form-label">Unanag Pangalan:</label>
+                            <label for="first_name" class="form-label">Firsta Name:</label>
                             <input type="text" name="first_name" class="form-control" required/>
                         </div>
                         <div class="mb-2">
-                            <label for="last_name" class="form-label">Apelyido:</label>
+                            <label for="last_name" class="form-label">Last Name:</label>
                             <input type="text" name="last_name" class="form-control" required/>
                         </div>
                         <div class="mb-2">
-                            <label for="username" class="form-label">Gamit na Pangalan:</label>
+                            <label for="username" class="form-label">Username:</label>
                             <input type="text" name="username" class="form-control" required/>
                         </div>
                         <div class="mb-2">
@@ -401,7 +401,7 @@ margin-left: 50px;
                                 <option value="Admin">Admin</option>
                             </select>
                         </div>
-                        <button type="submit" class="btn btn-success">Idagdag ang User</button>
+                        <button type="submit" class="btn btn-success">Add Now</button>
                     </form>
                 </div>
             </div>
@@ -423,17 +423,17 @@ margin-left: 50px;
                         <input type="hidden" name="user_id" value="{{ user.id }}">
 
                         <div class="mb-2">
-                            <label for="first_name">Unang Pangalan:</label>
+                            <label for="first_name">First Name:</label>
                             <input type="text" name="first_name" id="editFirstName{{ user.id }}" class="form-control" value="{{ user.first_name }}" required>
                         </div>
 
                         <div class="mb-2">
-                            <label for="last_name">Apelyido:</label>
+                            <label for="last_name">Last Name:</label>
                             <input type="text" name="last_name" id="editLastName{{ user.id }}" class="form-control" value="{{ user.last_name }}" required>
                         </div>
 
                         <div class="mb-2">
-                            <label for="username">Pangalang Ginagamit:</label>
+                            <label for="username">Username:</label>
                             <input type="text" name="username" id="editUsername{{ user.id }}" class="form-control" value="{{ user.username }}" required>
                         </div>
 
@@ -452,7 +452,7 @@ margin-left: 50px;
                             <input type="file" name="image_url" id="editImageUrl{{ user.id }}" class="form-control">
                         </div>
 
-                        <button type="submit" class="btn btn-success">I-update ang User</button>
+                        <button type="submit" class="btn btn-success">Update Now</button>
                     </form>
                 </div>
             </div>
