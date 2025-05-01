@@ -6,7 +6,9 @@ from .supabase_helper import upload_image_to_supabase
 import logging
 from supabase import create_client, Client
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserChangeForm
+from .models import Message
 
 logger = logging.getLogger(__name__)
 
@@ -164,3 +166,34 @@ class ProductForm(forms.ModelForm):
                 print("❌ File has 0 size, cannot upload image")
 
         return product
+
+
+# class MessageForm(forms.ModelForm):
+#     class Meta:
+#         model = Message
+#         fields = ['receiver', 'content', 'subject']  # Including only fields you need for the form
+
+#     receiver = forms.ModelChoiceField(queryset=CustomUser.objects.all())
+
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['receiver', 'content']
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)  # Accept 'user' as an argument
+        super().__init__(*args, **kwargs)
+
+        if user:
+            opposite_role = 'Admin' if user.role == 'User' else 'User'
+            self.fields['receiver'].queryset = CustomUser.objects.filter(role=opposite_role, is_deleted=False)
+        else:
+            self.fields['receiver'].queryset = CustomUser.objects.none()  # Fallback if no user provided
+
+
+class ImageUploadForm(forms.Form):
+    image = forms.ImageField()
+
+# class ImageUploadForm(forms.Form):
+#     image = forms.ImageField()
+#     model_type = forms.ChoiceField(choices=[('disease', 'Banana Disease Detection'), ('variety', 'Banana Variety Classification')])

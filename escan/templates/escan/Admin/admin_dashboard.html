@@ -319,6 +319,53 @@
             margin-bottom: 1rem;
             width: 100px;
         }
+
+        .message-icon {
+    position: relative; /* Positioning context for the badge */
+}
+
+        #unread-count {
+    position: absolute;
+    top: -3px;
+    right: -2px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    width: 18px; /* Set a specific width */
+    height: 18px; /* Set a specific height to match the width */
+    border-radius: 50%; /* Make it circular */
+    display: flex; /* Flexbox to center the content */
+    justify-content: center; /* Horizontally center the text */
+    align-items: center; /* Vertically center the text */
+    padding: 3px 0;
+}
+
+
+    .badge-notify {
+        background-color: #ff4d4d; /* Color for unread messages */
+    }
+
+    .unread-message {
+    background-color: #f0f8ff; /* Light blue background */
+    font-weight: bold;
+}
+
+.read-message {
+    background-color: white;
+    font-weight: normal;
+}
+
+.new-label {
+    background-color: #28a745;
+    color: white;
+    font-size: 10px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    margin-left: 6px;
+    text-transform: uppercase;
+}
+
         </style>
         
 </head>
@@ -415,8 +462,31 @@
                     </div>
                 </div>
 
-                <div class="message-icon" onclick="toggleMessages()" style="cursor: pointer;">
+                <div class="message-icon" id="message-icon" onclick="toggleMessages()" style="cursor: pointer;">
                     <i class="fas fa-comments" style="color: #0a0318;"></i>
+                    <span id="unread-count" class="badge">0</span>
+                    <!-- Message Dropdown -->
+                    <div id="messageDropdown" class="dropdown-menu" style="display: none; position: absolute; right: 10px; top: 80px; width: 350px; background-color: white; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 1000; padding: 10px;">
+                        <h5 class="dropdown-header" style="margin-bottom: 10px;">Unread Messages</h5>
+                        <div class="dropdown-content" style="max-height: 300px; overflow-y: auto;">
+                            {% if unread_messages %}
+                                {% for msg in unread_messages %}
+                                    <a href="{% url 'chat:thread' msg.thread.id %}" class="dropdown-item" style="padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; text-decoration: none;">
+                                        <div>
+                                            <strong>{{ msg.sender.username }}</strong><br>
+                                            <span style="font-size: 14px; color: gray;">{{ msg.content|truncatechars:30 }}</span>
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <p style="text-align: center; color: gray;">No new messages</p>
+                            {% endif %}
+                        </div>
+                        <hr>
+                        <div style="text-align: center;">
+                            <a href="{% url 'thread_placeholder' %}" class="btn btn-sm btn-outline-primary">View List</a>
+                        </div>
+                    </div>                    
                 </div>
                 <div class="notification-icon" onclick="toggleNotifications()" style="cursor: pointer;">
                     <i class="fas fa-bell" style="color: #0a0318;"></i>
@@ -660,6 +730,11 @@
         });
 </script>
 
+<script>
+    const CURRENT_USERNAME = "{{ request.user.username }}";
+</script>
+
+
 <script type="application/json" id="user-data">
     [
         {% for user in users %}
@@ -671,6 +746,129 @@
     ]
 </script>
 
-    
+<script>
+    function toggleMessages() {
+        const dropdown = document.getElementById("messageDropdown");
+        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+    }
+
+    // Optional: Click outside to close
+    window.addEventListener('click', function(e) {
+        const dropdown = document.getElementById("messageDropdown");
+        if (!dropdown.contains(e.target) && !e.target.closest('.message-icon')) {
+            dropdown.style.display = 'none';
+        }
+    });
+</script>
+
+<script>
+    // === Get CSRF token from cookies ===
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const csrftoken = getCookie('csrftoken');
+
+    // === Fetch and display unread messages ===
+    function fetchUnreadMessages() {
+        fetch("{% url 'unread_message_count' %}")
+            .then(response => response.json())
+            .then(data => {
+                const unreadCountElement = document.getElementById('unread-count');
+                unreadCountElement.textContent = data.unread_count;
+                unreadCountElement.style.display = data.unread_count > 0 ? 'inline' : 'none';
+
+                const dropdownContent = document.querySelector('#messageDropdown .dropdown-content');
+                dropdownContent.innerHTML = '';
+
+                if (data.unread_messages.length > 0) {
+                    data.unread_messages.forEach(msg => {
+                        const messageElement = document.createElement('a');
+                        messageElement.href = `/thread/${msg.thread_id}/`;
+                        messageElement.classList.add('dropdown-item');
+                        messageElement.classList.add(msg.is_read ? 'read-message' : 'unread-message');
+                        messageElement.style = "padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; text-decoration: none;";
+
+                        const newLabel = !msg.is_read ? `<span class="new-label">NEW</span>` : '';
+
+                        messageElement.innerHTML = `
+                            <div>
+                                <strong>${msg.sender_username} ${newLabel}</strong><br>
+                                <span style="font-size: 14px; color: gray;">${msg.content}</span>
+                            </div>
+                        `;
+
+                        // ✅ Only mark message as read when clicked
+                        messageElement.addEventListener('click', function (event) {
+                            event.preventDefault();  // Delay navigation
+                            fetch("{% url 'mark_single_message_as_read' %}", {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRFToken': csrftoken
+                                },
+                                body: JSON.stringify({ thread_id: msg.thread_id })  // Use msg.id if marking per message
+                            })
+                            .then(res => res.json())
+                            .then(() => {
+                                window.location.href = messageElement.href;  // Now navigate
+                            })
+                            .catch(err => {
+                                console.error("Error marking single message as read:", err);
+                                window.location.href = messageElement.href;
+                            });
+                        });
+
+                        dropdownContent.appendChild(messageElement);
+                    });
+                } else {
+                    const noMessages = document.createElement('p');
+                    noMessages.style.textAlign = 'center';
+                    noMessages.style.color = 'gray';
+                    noMessages.textContent = 'No new messages';
+                    dropdownContent.appendChild(noMessages);
+                }
+            })
+            .catch(error => console.error('Error fetching unread message count:', error));
+    }
+
+    // === Run fetch on page load and every 5s ===
+    setInterval(fetchUnreadMessages, 5000);
+    fetchUnreadMessages();
+
+    // === WebSocket updates (real-time dropdown updates) ===
+    function updateMessageDropdown(data) {
+        const dropdownContent = document.querySelector('#messageDropdown .dropdown-content');
+
+        const messageElement = document.createElement('a');
+        messageElement.href = `/thread/${data.thread_id}/`;
+        messageElement.classList.add('dropdown-item');
+        messageElement.classList.add(data.is_read ? 'read-message' : 'unread-message');
+        messageElement.style = "padding: 10px; border-bottom: 1px solid #eee; display: flex; gap: 10px; text-decoration: none;";
+
+        const newLabel = !data.is_read ? `<span class="new-label">NEW</span>` : '';
+
+        messageElement.innerHTML = `
+            <img src="${data.sender_image_url}" alt="Sender" style="width: 40px; height: 40px; border-radius: 50%;">
+            <div>
+                <strong>${data.sender} ${newLabel}</strong><br>
+                <span style="font-size: 14px; color: gray;">${data.message}</span>
+            </div>
+        `;
+
+        dropdownContent.insertBefore(messageElement, dropdownContent.firstChild);
+    }
+</script>
 </body>
 </html>

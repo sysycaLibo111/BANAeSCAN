@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
+from django.contrib.auth.models import User
 # from django.contrib.auth.models import 
 from django.conf import settings
 import uuid
@@ -61,7 +62,12 @@ class Category(models.Model):
 
 class Customer(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+<<<<<<< HEAD
     
+=======
+    # phone_number = models.CharField(max_length=15, blank=True, null=True)
+
+>>>>>>> 823799d2ddf2c166cb24bc62af63ca4dadd9d490
     class Meta:
         db_table = 'customer'
 
@@ -148,6 +154,7 @@ class ShippingAddress(models.Model):
     def __str__(self):
         return self.address
     
+<<<<<<< HEAD
 class Order(models.Model):
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
@@ -170,3 +177,51 @@ class Order(models.Model):
             self.product.stock -= self.quantity
             self.product.save()
         super().save(*args, **kwargs)
+=======
+
+#MESSAGES/INBOX MODEL
+class Thread(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='threads')
+    admin = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='admin_threads')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Thread between {self.user.username} and {self.admin.username}"
+
+class Message(models.Model):
+    thread = models.ForeignKey('Thread', related_name='messages', on_delete=models.CASCADE)
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages', null=True)
+    content = models.TextField()
+    # subject = models.CharField(max_length=255, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} at {self.timestamp}"
+
+# class DetectionRecord(models.Model):
+#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+#     prediction = models.CharField(max_length=255)
+#     confidence = models.FloatField()
+#     timestamp = models.DateTimeField(auto_now_add=True)
+#     image_url = models.URLField(max_length=500)
+
+
+class DetectionRecord(models.Model):
+    MODEL_CHOICES = [
+        ('disease', 'Disease'),
+        ('variety', 'Variety'),
+    ]
+
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    prediction = models.CharField(max_length=255)
+    confidence = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    image_url = models.URLField(max_length=500)
+    model_type = models.CharField(max_length=50, choices=MODEL_CHOICES, default=None,)
+
+
+
+
+>>>>>>> 823799d2ddf2c166cb24bc62af63ca4dadd9d490
