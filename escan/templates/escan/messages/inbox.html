@@ -1,0 +1,185 @@
+<!-- {% for thread in threads %}
+    <a href="{% url 'chat:thread' thread.id %}">{{ thread.admin.username }}</a>
+{% endfor %} -->
+
+<!-- templates/chat/inbox.html -->
+
+<!-- {% block content %}
+<div class="flex justify-center py-6">
+  <div class="w-full max-w-4xl bg-white shadow-lg rounded-lg">
+    <div
+      class="flex items-center justify-between p-4 bg-indigo-600 text-white rounded-t-lg"
+    >
+      <h2 class="text-xl font-semibold">Inbox</h2>
+      <button
+        class="bg-indigo-800 hover:bg-indigo-700 text-white px-4 py-2 rounded-md"
+      >
+        New Message
+      </button>
+    </div>
+    <div class="divide-y divide-gray-200">
+      {% for thread in threads %}
+      <a
+        href="{% url 'chat:thread' thread.id %}"
+        class="block p-4 hover:bg-gray-50"
+      >
+        <div class="flex items-center space-x-3">
+          <img
+            src="{{ thread.admin.image_url }}"
+            alt="{{ thread.admin.username }}"
+            class="w-10 h-10 rounded-full"
+          />
+          <div class="flex-1">
+            <p class="font-semibold text-gray-900">
+              {{ thread.admin.username }}
+            </p>
+            <p class="text-sm text-gray-600">
+              {{ thread.messages.last.content|truncatewords:10 }}
+            </p>
+          </div>
+          <span class="text-xs text-gray-500"
+            >{{ thread.created_at|date:"M d, Y" }}</span
+          >
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %} -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inbox</title>
+    <style>
+      .message-item.unread {
+        background-color: #f0f0f0; /* Light gray background for unread messages */
+      }
+
+      .message-item .read {
+        color: green;
+      }
+
+      .message-item .unread {
+        color: red;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(0, 0, 0);
+        background-color: rgba(0, 0, 0, 0.4);
+        padding-top: 60px;
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 5% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="inbox">
+      <h2>Inbox</h2>
+      <!-- Button to Open the Modal -->
+      <button id="composeBtn">Compose Message</button>
+
+      {% if messages %}
+      <ul>
+        {% for message in messages %}
+        <li class="message-item {% if not message.is_read %}unread{% endif %}">
+          <strong>{{ message.sender.username }}</strong>
+          <p><strong>Subject:</strong> {{ message.subject }}</p>
+          <p><strong>Content:</strong> {{ message.content }}</p>
+          <p><small>Received on: {{ message.timestamp }}</small></p>
+          <p>
+            <strong>Status:</strong> {% if message.is_read %}Read{% else %}Unread{% endif %}
+          </p>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p>No messages found.</p>
+      {% endif %}
+    </div>
+
+    <!-- The Modal -->
+    <div id="composeModal" class="modal">
+      <!-- Modal Content -->
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Compose Message</h3>
+        <form method="POST" action="{% url 'inbox' %}">
+          {% csrf_token %}
+          {{ form.as_p }}
+
+          <!-- Receiver dropdown dynamically filled from the form -->
+          <!-- <label for="receiver">Receiver:</label> -->
+          <!-- {{ form.receiver }} -->
+          <!-- <select id="receiver" name="receiver" required>
+            {% for user in receivers %}
+                <option value="{{ user.id }}">{{ user.username }}</option>
+            {% endfor %}
+        </select>
+
+          <label for="subject">Subject:</label>
+          <input type="text" id="subject" name="subject" required />
+
+          <label for="content">Message:</label>
+          <textarea id="content" name="content" rows="4" required></textarea> -->
+
+          <button type="submit">Send Message</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // Modal functionality
+      var modal = document.getElementById("composeModal");
+      var btn = document.getElementById("composeBtn");
+      var span = document.getElementsByClassName("close")[0];
+
+      btn.onclick = function () {
+        modal.style.display = "block";
+      };
+
+      span.onclick = function () {
+        modal.style.display = "none";
+      };
+
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+    </script>
+  </body>
+</html>

@@ -30,7 +30,7 @@ from django.contrib.auth.hashers import make_password
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
-from .forms import CategoryForm,ProductForm,UserProfileForm,  EditProfileForm
+from .forms import CategoryForm, ProductForm, UserProfileForm, EditProfileForm, MessageForm
 from .supabase_helper import upload_image_to_supabase
 import logging
 import io
@@ -43,6 +43,17 @@ from django.templatetags.static import static
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from datetime import datetime
 from django.contrib.staticfiles import finders  # For finding static files
+from .models import Thread, Message
+from django.db.models import OuterRef, Subquery, Max
+from .models import DetectionRecord
+import torch
+import torch.nn as nn
+from torchvision import models, transforms
+from PIL import Image
+from django.shortcuts import render
+from .forms import ImageUploadForm
+import torchvision.models as models
+import torch.serialization
 
 # Track last action (undo support)
 last_action = {}
@@ -856,8 +867,9 @@ def user_product_list(request):
 def user_dashboard(request):
     customer, created = Customer.objects.get_or_create(user=request.user)
     cart, created = Cart.objects.get_or_create(customer=customer, completed=False)
-    products = Product.objects.filter(is_deleted=False) 
-    return render(request, 'escan/User/user_dashboard.html', {'products': products,'cart': cart})
+    products = Product.objects.filter(is_deleted=False)
+    unread_messages = Message.objects.filter(receiver=request.user, is_read=False).select_related('sender', 'thread')
+    return render(request, 'escan/User/user_dashboard.html', {'products': products, 'cart': cart, 'unread_message': unread_messages})
 
 @login_required
 def update_item(request):
@@ -1047,5 +1059,663 @@ def ResetPassword(request, reset_id):
     except PasswordReset.DoesNotExist:
         messages.error(request, 'Invalid reset link.')
         return redirect('forgot-password')
+
+#MESSAGES/INBOX
+# def inbox(request):
+#     threads = Thread.objects.filter(user=request.user)
+#     return render(request, 'escan/messages/inbox.html', {'threads': threads})
+
+#2
+# def inbox(request):
+#     # Fetch all messages where the receiver is the logged-in user
+#     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+
+#     # Mark all messages as read
+#     # messages.filter(read=False).update(read=True)
+
+#     # Pass the messages to the template
+#     return render(request, 'escan/messages/inbox.html', {'messages': messages})
+
+# @login_required
+# def inbox(request):
+#     # Get all messages for the current logged-in user
+#     messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+
+#     # Logic to filter users based on role
+#     if request.user.role == 'User':
+#         receivers = CustomUser.objects.filter(role='Admin')
+#     elif request.user.role == 'Admin':
+#         receivers = CustomUser.objects.filter(role='User')
+#     else:
+#         receivers = CustomUser.objects.none()  # No receivers for other roles
+
+#     # Pass receivers to the form dynamically
+#     form = MessageForm()
+#     form.fields['receiver'].queryset = receivers  # Filter the receiver field
+
+#     if request.method == 'POST':
+#         form = MessageForm(request.POST)
+#         if form.is_valid():
+#             receiver = form.cleaned_data['receiver']
+#             content = form.cleaned_data['content']
+#             subject = form.cleaned_data['subject']
+
+#             logging.debug(f"Form valid. Receiver: {receiver}, Content: {content}, Subject: {subject}")
+
+#             # Create a new thread if it doesn't exist
+#             thread, created = Thread.objects.get_or_create(user=request.user, admin=receiver)
+
+#             # Create the message and save it
+#             Message.objects.create(
+#                 thread=thread,
+#                 sender=request.user,
+#                 receiver=receiver,
+#                 content=content,
+#                 subject=subject
+#             )
+#             logging.debug(f"Message created: {Message}")
+#             return redirect('inbox')
+#         else:
+#             # Log the form errors if invalid
+#             logging.debug(f"Form errors: {form.errors}")
+#             return HttpResponse("Form is not valid")
+
+#     return render(request, 'escan/messages/inbox.html', {'messages': messages, 'form': form, 'receivers': receivers})
+
+def inbox(request):
+    # Get all messages for the current logged-in user
+    messages = Message.objects.filter(receiver=request.user).order_by('-timestamp')
+
+    # Logic to filter users based on role
+    if request.user.role == 'User':
+        receivers = CustomUser.objects.filter(role='Admin')
+    elif request.user.role == 'Admin':
+        receivers = CustomUser.objects.filter(role='User')
+    else:
+        receivers = CustomUser.objects.none()  # No receivers for other roles
+
+    # Pass receivers to the form dynamically
+    form = MessageForm()
+    form.fields['receiver'].queryset = receivers  # Filter the receiver field
+
+    if request.method == 'POST':
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            receiver = form.cleaned_data['receiver']
+            content = form.cleaned_data['content']
+            subject = form.cleaned_data['subject']
+
+            logging.debug(f"Form valid. Receiver: {receiver}, Content: {content}, Subject: {subject}")
+
+            # Create a new thread if it doesn't exist
+            thread, created = Thread.objects.get_or_create(user=request.user, admin=receiver)
+
+            # Create the message and save it
+            Message.objects.create(
+                thread=thread,
+                sender=request.user,
+                receiver=receiver,
+                content=content,
+                subject=subject
+            )
+            logging.debug(f"Message created.")
+            return redirect('inbox')
+        else:
+            logging.debug(f"Form errors: {form.errors}")
+            return HttpResponse("Form is not valid")
+
+    return render(request, 'escan/messages/inbox.html', {'messages': messages, 'form': form, 'receivers': receivers})
+
+# def unread_message_count(request):
+#     # Count the number of unread messages for the current user
+#     unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
+    
+#     # Get the unread messages for the dropdown
+#     unread_messages = Message.objects.filter(receiver=request.user, is_read=False)[:5]  # Limit to 5 messages for performance
+
+#     # Prepare a list of message details for the frontend
+#     unread_messages_data = [
+#         {
+#             'thread_id': msg.thread.id,
+#             'sender_image_url': msg.sender.image_url.url if msg.sender.image_url else '',  # Ensure we get a URL string
+#             'sender_username': msg.sender.username,
+#             'content': msg.content[:30],  # Truncate message content
+#         }
+#         for msg in unread_messages
+#     ]
+    
+#     return JsonResponse({
+#         'unread_count': unread_count,
+#         'unread_messages': unread_messages_data  # Send unread messages as a list of dictionaries
+#     })
+
+def unread_message_count(request):
+    # Count all unread messages for the badge
+    unread_count = Message.objects.filter(receiver=request.user, is_read=False).count()
+
+    # Get the latest message for each sender to this user
+    latest_msg_subquery = Message.objects.filter(
+        receiver=request.user,
+        is_read=False,
+        sender=OuterRef('sender')
+    ).order_by('-timestamp')
+
+    # Get latest messages by each sender
+    latest_messages = Message.objects.filter(
+        id__in=Subquery(
+            latest_msg_subquery.values('id')[:1]
+        )
+    ).order_by('-timestamp')[:5]  # Limit to top 5 most recent latest messages
+
+    unread_messages_data = [
+        {
+            'thread_id': msg.thread.id,
+            'sender_image_url': msg.sender.image_url.url if msg.sender.image_url else '',
+            'sender_username': msg.sender.username,
+            'content': msg.content[:30],
+            'is_read': msg.is_read,
+        }
+        for msg in latest_messages
+    ]
+
+    return JsonResponse({
+        'unread_count': unread_count,
+        'unread_messages': unread_messages_data
+    })
+
+def mark_messages_as_read(request):
+    Message.objects.filter(receiver=request.user, is_read=False).update(is_read=True)
+    return JsonResponse({'status': 'success'})
+
+# def mark_as_read(request, message_id):
+#     if request.method == "POST":
+#         try:
+#             message = Message.objects.get(id=message_id)
+#             if message.receiver == request.user and not message.is_read:
+#                 message.is_read = True
+#                 message.save()
+#                 return JsonResponse({"status": "success"})
+#             else:
+#                 return JsonResponse({"status": "error", "message": "Unauthorized or already read."}, status=400)
+#         except Message.DoesNotExist:
+#             return JsonResponse({"status": "error", "message": "Message not found."}, status=404)
+
+def thread_view(request, thread_id):
+    thread = Thread.objects.get(id=thread_id)
+    
+    # Update 'is_read' flag for messages when viewed
+    thread.messages.filter(receiver=request.user, is_read=False).update(is_read=True)
+    messages = thread.messages.all()
+    unread_messages = thread.messages.filter(receiver=request.user, is_read=False)
+
+    if request.method == "POST":
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user  # Set the logged-in user as the sender
+            message.thread = thread
+            message.receiver = thread.admin  # The receiver of the message (admin or user)
+            message.save()
+
+            return redirect('thread_view', thread_id=thread.id)
+    
+    else:
+        # form = MessageForm()
+        form = MessageForm(user=request.user)
+
+    return render(request, 'escan/messages/thread.html', {'thread': thread, 'messages': messages, 'form': form, 'unread_messages': unread_messages})
+
+def send_message(request):
+    if request.method == "POST":
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            message = form.save(commit=False)
+            message.sender = request.user  # Set the logged-in user as the sender
+
+            # Get the receiver and make sure the thread is appropriately assigned.
+            receiver = form.cleaned_data['receiver']
+            message.receiver = receiver
+
+            # Check if a thread exists between the user and receiver. Create one if necessary.
+            thread, created = Thread.objects.get_or_create(user=request.user, admin=receiver)
+
+            # Assign the thread to the message.
+            message.thread = thread
+            message.save()
+
+            return redirect('thread_view', thread_id=thread.id)  # Redirect to the thread view
+    else:
+        form = MessageForm()
+
+    return render(request, 'escan/messages/inbox.html', {'form': form})
+
+
+@csrf_exempt  # Optional if you're manually handling CSRF (best to keep CSRF check!)
+def mark_single_message_as_read(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        thread_id = data.get('thread_id')
+        Message.objects.filter(thread_id=thread_id, receiver=request.user, is_read=False).update(is_read=True)
+        return JsonResponse({'status': 'marked'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# @login_required
+# def latest_messages_for_thread(request):
+#     # Get all latest messages **sent to** the current user
+#     latest_messages = (
+#         Message.objects
+#         .filter(receiver=request.user)
+#         .values('sender__username', 'thread__id')
+#         .annotate(latest_time=Max('timestamp'))
+#         .order_by('-latest_time')
+#     )
+
+#     # Collect the actual message content
+#     data = []
+#     for msg in latest_messages:
+#         message = (
+#             Message.objects
+#             .filter(sender__username=msg['sender__username'], thread_id=msg['thread__id'])
+#             .order_by('-timestamp')
+#             .first()
+#         )
+#         data.append({
+#             'sender': msg['sender__username'],
+#             'content': message.content,
+#             'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M'),
+#             'thread_id': msg['thread__id'],
+#         })
+
+#     return JsonResponse(data, safe=False)
+
+def latest_message_for_thread(request):
+    # Step 1: Get the latest messages per thread+sender to this user
+    latest_messages = (
+        Message.objects
+        .filter(receiver=request.user)
+        .values('sender__username', 'thread__id')
+        .annotate(latest_time=Max('timestamp'))
+    )
+
+    # Step 2: Collect the actual message content + is_read flag
+    data = []
+    for msg in latest_messages:
+        message = (
+            Message.objects
+            .filter(
+                sender__username=msg['sender__username'],
+                thread_id=msg['thread__id'],
+                receiver=request.user  # Ensures it’s a message TO the current user
+            )
+            .order_by('-timestamp')
+            .first()
+        )
+
+        if message:
+            data.append({
+                'sender': msg['sender__username'],
+                'content': message.content,
+                'timestamp': message.timestamp.strftime('%Y-%m-%d %H:%M'),
+                'thread_id': msg['thread__id'],
+                'is_read': message.is_read,
+            })
+
+    # Step 3: Sort unread messages first, then newest to oldest
+    data.sort(key=lambda x: (x['is_read'], -int("".join(x['timestamp'].replace("-", "").replace(":", "").replace(" ", "")))))
+
+    return JsonResponse(data, safe=False)
+
+# @login_required
+# def thread_placeholder(request):
+#     # Get the latest message from each sender (to the current user)
+#     latest_messages = (
+#         Message.objects.filter(receiver=request.user)
+#         .order_by('sender', '-timestamp')
+#         .distinct('sender')  # Works only on PostgreSQL
+#     )
+
+#     return render(request, 'escan/messages/thread.html', {
+#         'thread': None,
+#         'messages': [],
+#         'latest_messages': latest_messages
+#     })
+
+
+def thread_placeholder(request):
+    messages = (
+        Message.objects.filter(receiver=request.user)
+        .order_by('-timestamp')
+    )
+
+    latest_by_sender = {}
+    for msg in messages:
+        if msg.sender_id not in latest_by_sender:
+            latest_by_sender[msg.sender_id] = msg
+
+    form = MessageForm(user=request.user)  # Pass user here
+
+    return render(request, 'escan/messages/thread.html', {
+        'thread': None,
+        'messages': [],
+        'latest_messages': latest_by_sender.values(),
+        'form': form
+    })
+
+
+@login_required
+def compose_message(request):
+    if request.method == 'POST':
+        subject = request.POST.get('subject')
+        content = request.POST.get('content')
+        current_user = request.user
+
+        # Determine the recipient based on role
+        if current_user.role == 'Admin':
+            receiver = User.objects.filter(role='User', is_deleted=False).exclude(id=current_user.id).first()
+        else:
+            receiver = User.objects.filter(role='Admin', is_deleted=False).exclude(id=current_user.id).first()
+
+        if not receiver:
+            # Handle if there's no receiver found
+            messages.error(request, "No recipient available.")
+            return redirect('inbox')
+
+        # Try to find existing thread
+        thread = Thread.objects.filter(user__in=[current_user, receiver], admin__in=[current_user, receiver]).first()
+        if not thread:
+            if current_user.role == 'Admin':
+                thread = Thread.objects.create(user=receiver, admin=current_user)
+            else:
+                thread = Thread.objects.create(user=current_user, admin=receiver)
+
+        # Create and save the message
+        Message.objects.create(
+            thread=thread,
+            sender=current_user,
+            receiver=receiver,
+            content=content
+        )
+
+        return redirect('thread_placeholder')
+
+
+#SCAN SCAM
+# Allow loading of ResNet model class
+torch.serialization.add_safe_globals({
+    'torchvision.models.resnet.ResNet': models.ResNet
+})
+
+#banana disease model
+def load_disease_model():
+    # Load the disease model (Replace with your actual model loading code)
+    model = models.resnet18(weights=None)  # Example, change to your model
+    num_ftrs = model.fc.in_features
+    model.fc = torch.nn.Linear(num_ftrs, 10)  # number of classes in your disease model
+    model.load_state_dict(torch.load('escan/model/banana_disease_resnet_state_dict.pth'))
+    model.eval()
+    return model
+
+def banana_disease(request):
+    model = load_disease_model()
+    class_names = ['Banana Anthracnose Fruit disease', 'Banana Bract Mosaic Virus Disease', 'Banana Cordana Leaf Disease',
+                   'Banana Fusarium Wilt Tree Disease', 'Banana Insect Pest Disease', 'Banana Naturally Leaf Dead',
+                   'Banana Panama Leaf Disease', 'Banana Pestalotiopsis Disease', 'Banana Rhizome Root Tree Disease',
+                   'Banana Sigatoka Leaf Disease']
+    class_descriptions = {
+        'Banana Anthracnose Fruit disease': {'description': 'Description of Anthracnose...', 'symptoms': 'Symptoms of Anthracnose...', 'management': 'Management of Anthracnose...', 'prevention': 'Prevention of Anthracnose...'},
+        'Banana Bract Mosaic Virus Disease': {'description': 'Description of Anthracnose...', 'symptoms': 'Symptoms of Anthracnose...', 'management': 'Management of Anthracnose...', 'prevention': 'Prevention of Anthracnose...'},
+        'Banana Cordana Leaf Disease': {'description': 'Banana Cordana Leaf Disease description', 'symptoms': 'Symptoms of Anthracnose...', 'management': 'Management of Anthracnose...', 'prevention': 'Prevention of Anthracnose...'},
+        'Banana Anthracnose Fruit disease': {'description': 'Description of Anthracnose...', 'symptoms': 'Symptoms of Anthracnose...', 'management': 'Management of Anthracnose...', 'prevention': 'Prevention of Anthracnose...'},
+        'Banana Anthracnose Fruit disease': {'description': 'Description of Anthracnose...', 'symptoms': 'Symptoms of Anthracnose...', 'management': 'Management of Anthracnose...', 'prevention': 'Prevention of Anthracnose...'},
+        'Banana Anthracnose Fruit disease': {'description': 'Description of Anthracnose...', 'symptoms': 'Symptoms of Anthracnose...', 'management': 'Management of Anthracnose...', 'prevention': 'Prevention of Anthracnose...'},
+        # Add other diseases here...
+    }
+
+    result = None
+    confidence = None
+    prediction_time = None
+    image_url = None
+    disease_info = None
+
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.cleaned_data['image']
+            img = Image.open(image).convert('RGB')
+            img_tensor = transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])(img).unsqueeze(0)
+
+            with torch.no_grad():
+                output = model(img_tensor)
+                probabilities = torch.nn.functional.softmax(output[0], dim=0)
+                confidence = torch.max(probabilities).item() * 100
+                _, predicted = torch.max(output, 1)
+                result = class_names[predicted.item()]
+                prediction_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                disease_info = class_descriptions.get(result)
+
+            # 🔼 Upload image to Supabase
+            user = request.user
+            image.seek(0)  # Reset pointer
+            file_data = image.read()
+            file_name = f"{user.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{image.name}"
+            
+            supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_ROLE_KEY)
+            bucket = supabase.storage.from_('detection-images')
+
+            try:
+                # Upload image with correct content type
+                upload_response = bucket.upload(file_name, file_data, {
+                    "content-type": image.content_type
+                })
+                print("🔍 Response from Supabase:", upload_response)
+
+                # If response has 'path' attribute, use it to get the public URL
+                if hasattr(upload_response, 'path') and upload_response.path:
+                    # Construct public URL from response
+                    image_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/detection-images/{upload_response.path}"
+
+                    # Save to DB
+                    DetectionRecord.objects.create(
+                        user=user,
+                        prediction=result,
+                        confidence=confidence,
+                        image_url=image_url,
+                        model_type='disease'
+                    )
+                    print("✅ Detection record saved successfully")
+                else:
+                    print("❌ Upload error: No path in response")
+
+            except Exception as e:
+                print(f"⚠️ Supabase upload error: {e}")
+
+            return render(request, 'escan/User/Scan/banana_disease_result.html', {
+                'result': result,
+                'confidence': confidence,
+                'prediction_time': prediction_time,
+                'image_url': image_url,
+                'disease_info': disease_info,
+            })
+
+    else:
+        form = ImageUploadForm()
+
+    # Get current user's past records (most recent first)
+    # user_records = DetectionRecord.objects.filter(user=request.user).order_by('-timestamp')[:4]
+
+    # return render(request, 'escan/User/Scan/banana_disease.html', {'form': form, 'user_records': user_records})
+    return render(request, 'escan/User/Scan/banana_disease.html', {'form': form})
+
+#banana variety model
+def load_variety_model():
+    # Load the variety model (Replace with your actual model loading code)
+    model = models.resnet18(weights=None)  # Example, change to your model
+    num_ftrs = model.fc.in_features
+    model.fc = torch.nn.Linear(num_ftrs, 8)  # number of classes in your variety model
+    model.load_state_dict(torch.load('escan/model/banana_variety_resnet_state_dict.pth'))
+    model.eval()
+    return model
+
+def banana_variety(request):
+    model = load_variety_model()
+    class_names = ['Anaji', 'Banana Lady Finger ( Señorita )', 'Banana Red', 'Bichi', 'Canvendish(Bungulan)', 'Lakatan', 'Saba', 'Sabri Kola']
+    class_descriptions = {
+        'Anaji': {'description': 'Description of Anaji variety...', 'symptoms': 'Symptoms of Anaji...', 'management': 'Management of Anaji...', 'prevention': 'Prevention of Anaji...'},
+        # Add other varieties here...
+    }
+
+    result = None
+    confidence = None
+    prediction_time = None
+    image_url = None
+    disease_info = None
+
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.cleaned_data['image']
+            img = Image.open(image).convert('RGB')
+            img_tensor = transforms.Compose([
+                transforms.Resize(256),
+                transforms.CenterCrop(224),
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ])(img).unsqueeze(0)
+
+            with torch.no_grad():
+                output = model(img_tensor)
+                probabilities = torch.nn.functional.softmax(output[0], dim=0)
+                confidence = torch.max(probabilities).item() * 100
+                _, predicted = torch.max(output, 1)
+                result = class_names[predicted.item()]
+                prediction_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                disease_info = class_descriptions.get(result)
+
+            # 🔼 Upload image to Supabase
+            user = request.user
+            image.seek(0)  # Reset pointer
+            file_data = image.read()
+            file_name = f"{user.id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{image.name}"
+            
+            supabase = create_client(settings.SUPABASE_URL, settings.SUPABASE_ROLE_KEY)
+            bucket = supabase.storage.from_('detection-images')
+
+            try:
+                # Upload image with correct content type
+                upload_response = bucket.upload(file_name, file_data, {
+                    "content-type": image.content_type
+                })
+                print("🔍 Response from Supabase:", upload_response)
+
+                # If response has 'path' attribute, use it to get the public URL
+                if hasattr(upload_response, 'path') and upload_response.path:
+                    # Construct public URL from response
+                    image_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/detection-images/{upload_response.path}"
+
+                    # Save to DB
+                    DetectionRecord.objects.create(
+                        user=user,
+                        prediction=result,
+                        confidence=confidence,
+                        image_url=image_url,
+                        model_type='variety'
+                    )
+                    print("✅ Detection record saved successfully")
+                else:
+                    print("❌ Upload error: No path in response")
+
+            except Exception as e:
+                print(f"⚠️ Supabase upload error: {e}")
+
+            return render(request, 'escan/User/Scan/banana_variety_result.html', {
+                'result': result,
+                'confidence': confidence,
+                'prediction_time': prediction_time,
+                'image_url': image_url,
+                'disease_info': disease_info,
+            })
+
+    else:
+        form = ImageUploadForm()
+
+    # user_records = DetectionRecord.objects.filter(user=request.user).order_by('-timestamp')[:4]
+
+    return render(request, 'escan/User/Scan/banana_variety.html', {'form': form})
+
+@login_required
+def disease_scan_history(request):
+    user_records = DetectionRecord.objects.filter(user=request.user).order_by('-timestamp')
+    return render(request, 'escan/User/Scan/disease_scan_records.html', {'user_records': user_records})
+
+@login_required
+def variety_scan_history(request):
+    user_records = DetectionRecord.objects.filter(user=request.user).order_by('-timestamp')
+    return render(request, 'escan/User/Scan/variety_scan_records.html', {'user_records': user_records})
+
+
+@login_required
+def view_scan_result(request, record_id):
+    record = get_object_or_404(DetectionRecord, pk=record_id, user=request.user)
+
+    # Use the model_type to determine which result template to render
+    template = 'escan/User/Scan/banana_disease_result.html' if record.model_type == 'disease' else 'escan/User/Scan/banana_variety_result.html'
+
+     # Disease Descriptions
+    disease_descriptions = {
+        'Banana Anthracnose Fruit disease': {
+            'description': 'Description of Anthracnose...',
+            'symptoms': 'Symptoms of Anthracnose...',
+            'management': 'Management of Anthracnose...',
+            'prevention': 'Prevention of Anthracnose...'
+        },
+        'Banana Bract Mosaic Virus Disease': {
+            'description': 'banana bract...',
+            'symptoms': 'Symptoms of Anthracnose...',
+            'management': 'Management of Anthracnose...',
+            'prevention': 'Prevention of Anthracnose...'
+        },
+        # Add all other disease info...
+    }
+
+    # Variety Descriptions
+    variety_descriptions = {
+        'Anaji': {
+            'description': 'Description of Anaji...',
+            'symptoms': 'Symptoms of Anaji...',
+            'management': 'Management of Anaji...',
+            'prevention': 'Prevention of Anaji...'
+        },
+        'Banana Lady Finger ( Señorita )': {
+            'description': 'Description of Señorita...',
+            'symptoms': 'N/A',
+            'management': 'N/A',
+            'prevention': 'N/A'
+        },
+        # Add all other variety info...
+    }
+
+    prediction_key = record.prediction.strip()
+
+    if record.model_type == 'disease':
+        disease_info = disease_descriptions.get(prediction_key, {})
+    elif record.model_type == 'variety':
+        disease_info = variety_descriptions.get(prediction_key, {})
+    else:
+        disease_info = {}
+
+    return render(request, template, {
+        'result': record.prediction,
+        'confidence': record.confidence,
+        'prediction_time': record.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
+        'image_url': record.image_url,
+        'disease_info': disease_info
+    })
+
 
 

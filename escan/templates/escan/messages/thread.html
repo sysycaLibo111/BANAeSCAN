@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <title>Thread</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px; /* outer spacing */
+        box-sizing: border-box;
+        background-color: white;
+        font-family: sans-serif;
+      }
+
+      .main-container {
+        top: 50px;
+        display: flex;
+        height: calc(100vh - 40px); /* Full height minus body padding */
+        gap: 20px; /* space between sidebar and chat */
+      }
+
+      .sidebar {
+        flex: 3; /* 30% */
+        background-color: white;
+        border: 1px solid #dadada;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .chat-container {
+        flex: 7; /* 70% */
+        background-color: #f9f9f9;
+        border: 1px solid #dadada;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
+
+      .chat-header {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .chat-log {
+        flex: 1;
+        overflow-y: auto;
+        padding: 15px;
+        background-color: white;
+      }
+
+      .chat-message {
+        display: flex;
+        margin-bottom: 10px;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      .chat-message.sent {
+        justify-content: flex-end;
+      }
+
+      .message-wrapper {
+        max-width: 70%;
+        display: flex;
+        width: auto;
+      }
+
+      .chat-message.received {
+        justify-content: flex-start;
+      }
+
+      .chat-message.sent .message-wrapper {
+        justify-content: flex-end;
+      }
+
+      .chat-message.received .message-wrapper {
+        justify-content: flex-start;
+      }
+
+      .message-content {
+        padding: 6px 10px;
+        border-radius: 10px;
+        background-color: #e9ecef;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        line-height: 1.4;
+        word-break: break-word;
+      }
+
+      .chat-message.sent .message-content {
+        background-color: #007bff;
+        color: white;
+      }
+
+      .chat-message.received .message-content {
+        background-color: #f1f1f1;
+      }
+
+      .chat-input {
+        display: flex;
+        padding: 15px;
+        background-color: #ffffff;
+        border-top: 1px solid #ddd;
+      }
+
+      .chat-input input {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 20px;
+        font-size: 1em;
+      }
+
+      .chat-input button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin-left: 10px;
+        border-radius: 20px;
+        cursor: pointer;
+      }
+
+      .chat-input button:hover {
+        background-color: #0056b3;
+      }
+
+      .sidebar h4 {
+        margin-bottom: 15px;
+        text-align: center;
+        font-size: 18px;
+      }
+
+      .sidebar .latest-message {
+        padding: 10px;
+        background-color: #e9ecef;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .sidebar .latest-message:hover {
+        background-color: #007bff;
+        color: white;
+      }
+
+      #latest-messages-list {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        margin-bottom: 5px;
+      }
+
+      .latest-message {
+        margin-bottom: 12px; /* Adds vertical space between messages */
+        padding: 10px;
+      }
+
+      /* #latest-messages-list .latest-message {
+    word-break: break-word;
+    white-space: normal;
+} */
+
+      .new-label {
+        background-color: #28a745;
+        color: white;
+        font-size: 10px;
+        padding: 2px 4px;
+        border-radius: 4px;
+        margin-left: 6px;
+        text-transform: uppercase;
+      }
+
+      #sidebar {
+        flex: 3; /* 30% */
+        background-color: white;
+        border: 1px solid #dadada;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      #latest-messages-list {
+        overflow-y: auto; /* Allow scrolling if content exceeds height */
+        max-height: 80vh; /* Fix the height of the messages container */
+        word-wrap: break-word;
+      }
+
+      .latest-message {
+        margin-bottom: 12px; /* Adds vertical space between messages */
+        padding: 10px;
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Truncate long text */
+      }
+
+      .latest-message p {
+        margin: 0; /* Remove margin for the paragraph */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Truncate the text with ellipsis */
+      }
+
+      .latest-message strong {
+        font-size: 1em;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .latest-message .new-label {
+        background-color: #28a745;
+        color: white;
+        font-size: 10px;
+        padding: 2px 4px;
+        border-radius: 4px;
+        margin-left: 6px;
+        text-transform: uppercase;
+      }
+
+      .latest-message.unread {
+        background-color: #d4edda; /* light green background */
+      }
+
+      .md {
+        font-size: 8px;
+      }
+
+      .latest-message.active {
+  background-color: #007bff; /* blue background for active conversation */
+  color: white; /* white text color for better visibility */
+}
+
+.latest-message.active:hover {
+  background-color: #0056b3; /* darker blue when hovering over the active conversation */
+}
+
+.modal {
+        display: none; /* Initially hide modal */
+        position: fixed;
+        z-index: 999;
+        left: 0;
+        top: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-content {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        position: relative;
+      }
+
+      .modal .close {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        font-size: 24px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #999;
+      }
+
+      .modal .close:hover {
+        color: #333;
+      }
+
+      .modal-content button[type="submit"] {
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .modal-content button[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      .modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modal-content form label {
+  font-weight: bold;
+  font-size: 0.9em;
+  margin-bottom: 4px;
+}
+
+.modal-content form select,
+.modal-content form textarea,
+.modal-content form input[type="text"],
+.modal-content form input[type="email"] {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95em;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-content form textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+.button-primary {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button-primary:hover {
+  background-color: #0056b3;
+}
+
+
+    </style>
+  </head>
+  <body>
+    <a
+      href="{% if user.role == 'Admin' %}{% url 'admin_dashboard' %}{% else %}{% url 'user_dashboard' %}{% endif %}"
+      class="go-back-link"
+    >
+      <i class="fas fa-arrow-left"></i> Go back
+    </a>
+
+    <div class="main-container">
+      <!-- Sidebar -->
+      <div id="sidebar" class="sidebar">
+        <h4>Chats</h4>
+        <!-- <div id="latest-messages-list" style="margin-top: 20px;"></div> -->
+        <div id="latest-messages-list" style="margin-top: 20px;">
+          {% if latest_messages %}
+            {% for msg in latest_messages %}
+              <div class="latest-message {% if thread and thread.id == msg.thread.id %}active-thread{% endif %}"
+                   onclick="window.location.href='/thread/{{ msg.thread.id }}/'">
+                <strong>From: {{ msg.sender.username }}</strong>
+                <p>{{ msg.content|truncatechars:30 }}</p>
+                <small>{{ msg.timestamp|date:'M j, Y H:i' }}</small>
+                {% if not msg.is_read %}
+                  <span class="new-label">NEW</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          {% else %}
+            <p>No messages.</p>
+          {% endif %}
+        </div>
+
+        <!-- Compose Button at the bottom -->
+      <div style="margin-top: auto; padding-top: 20px;">
+        <button id="composeBtn" class="button-primary full-width">Compose Message</button>
+      </div>
+      </div>
+
+      <div id="composeModal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <h3>Compose Message</h3>
+          <!-- <form method="POST" action="{% url 'compose_message' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Send Message</button>
+          </form> -->
+          <form method="POST" action="{% url 'compose_message' %}">
+            {% csrf_token %}
+            
+            <label for="{{ form.receiver.id_for_label }}">To:</label>
+            {{ form.receiver }}
+          
+            <!-- <label for="{{ form.subject.id_for_label }}">Subject:</label>
+            {{ form.subject }} -->
+          
+            <label for="{{ form.content.id_for_label }}">Message:</label>
+            {{ form.content }}
+          
+            <button type="submit" class="button-primary">Send Message</button>
+          </form>
+          
+        </div>
+      </div>
+
+
+      <!-- Chat Container -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <h3>Conversation</h3>
+        </div>
+
+        <!-- <div id="chat-log" class="chat-log">
+        {% for message in messages %}
+        <div class="chat-message {% if message.sender == user %}sent{% else %}received{% endif %}">
+          <div>
+            <div class="message-content">
+              <p>{{ message.content }}</p>
+            </div>
+            <div class="message-info">
+              <small>{{ message.timestamp|date:"F j, Y | g:i A" }}</small>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div> -->
+
+        <div id="chat-log" class="chat-log">
+          {% if thread %} {% for message in messages %}
+          <div
+            class="chat-message {% if message.sender == user %}sent{% else %}received{% endif %}"
+          >
+            <div class="message-wrapper">
+              <div class="message-content">
+                <p>{{ message.content }}</p>
+                <div class="message-info">
+                  <small class="md">{{ message.timestamp|date:"F j, Y | g:i A" }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% endfor %} {% else %}
+          <div style="text-align: center; margin-top: 100px; color: gray">
+            <p>No conversation selected.</p>
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="chat-input">
+          <input
+            type="text"
+            id="message-input"
+            placeholder="Type a message..."
+            autocomplete="off"
+          />
+          <button id="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Auto-scroll
+      function scrollToLatestMessage() {
+        const chatLog = document.getElementById("chat-log");
+        chatLog.scrollTop = chatLog.scrollHeight;
+      }
+
+      // {% if thread %}
+      const chatSocket = new WebSocket(
+        "ws://" + window.location.host + "/ws/inbox/{{ thread.id }}/"
+      );
+
+      window.addEventListener("load", scrollToLatestMessage);
+
+      chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        const isSender = data.sender === "{{ user.username }}";
+
+        // if (!isSender) {
+        //   document.getElementById(
+        //     "sidebar-sender"
+        //   ).textContent = `From: ${data.sender}`;
+        //   document.getElementById("sidebar-message").textContent = data.message;
+        // }
+
+        const messageElement = document.createElement("div");
+        messageElement.classList.add(
+          "chat-message",
+          isSender ? "sent" : "received"
+        );
+
+        messageElement.innerHTML = `
+        <div class="message-wrapper">
+          <div class="message-content">
+            <p>${data.message}</p>
+            <div class="message-info">
+              <small class="md">${data.sender} to ${data.receiver} - ${new Date(data.timestamp).toLocaleString()}</small>
+            </div>
+          </div>
+        </div>
+      `;
+
+        const chatLog = document.getElementById("chat-log");
+        chatLog.appendChild(messageElement);
+        scrollToLatestMessage();
+        updateSidebarWithLatestMessages();
+      };
+
+      document.getElementById("send-button").onclick = function () {
+        const messageInputDom = document.getElementById("message-input");
+        const message = messageInputDom.value.trim();
+
+        if (message) {
+          chatSocket.send(JSON.stringify({ message: message }));
+          messageInputDom.value = "";
+        }
+      };
+
+      document.getElementById("message-input").focus();
+      document.getElementById("message-input").onkeyup = function (e) {
+        if (e.keyCode === 13) {
+          document.getElementById("send-button").click();
+        }
+      };
+      // {% endif %}
+
+      const currentThreadId = "{{ thread.id }}";
+
+      function updateSidebarWithLatestMessages() {
+        fetch("{% url 'latest_message_for_thread' %}")
+          .then((response) => response.json())
+          .then((data) => {
+            const sidebarList = document.getElementById("latest-messages-list");
+            sidebarList.innerHTML = ""; // Clear existing content
+
+            if (!data.length) {
+              sidebarList.innerHTML = "<p>No messages.</p>";
+              return;
+            }
+
+            data.forEach((msg) => {
+              const newLabel = !msg.is_read
+                ? `<span class="new-label">NEW</span>`
+                : "";
+              const messageDiv = document.createElement("div");
+              messageDiv.className = "latest-message";
+              // Add 'active' class if this message is related to the current thread
+              if (msg.thread_id == currentThreadId) {
+                messageDiv.classList.add("active");
+              }
+              if (!msg.is_read) {
+                messageDiv.classList.add("unread");
+              }
+              messageDiv.innerHTML = `
+          <strong>From: ${msg.sender} ${newLabel}</strong>
+          <p>${msg.content}</p>
+          <small>${msg.timestamp}</small>
+        `;
+              messageDiv.onclick = () => {
+                window.location.href = `/thread/${msg.thread_id}/`;
+              };
+              sidebarList.appendChild(messageDiv);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching sidebar messages:", error);
+          });
+      }
+
+      window.addEventListener("load", updateSidebarWithLatestMessages);
+    </script>
+
+    <script>
+      // Modal functionality
+      const modal = document.getElementById("composeModal");
+      const btn = document.getElementById("composeBtn");
+      const span = document.getElementsByClassName("close")[0];
+    
+      btn.onclick = function () {
+        modal.style.display = "flex";
+      };
+    
+      span.onclick = function () {
+        modal.style.display = "none";
+      };
+    
+      window.onclick = function (event) {
+        if (event.target == modal) {
+          modal.style.display = "none";
+        }
+      };
+    </script>
+  </body>
+</html>
